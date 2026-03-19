@@ -1,0 +1,9 @@
+{
+  "name": "birthday-wish",
+  "version": "1.0.0",
+  "description": "Emotional Birthday Wish - static HTML/CSS/JS",
+  "scripts": {
+    "start": "npx serve -l 3000",
+    "test": "echo \"Open http://localhost:3000 and run through DEPLOY.md checklist\""
+  }
+}

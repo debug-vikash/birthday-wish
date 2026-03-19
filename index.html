@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Wish - Special Surprise</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ============================================
+       SCREEN 1: Name Input
+       User enters the birthday person's name first
+       ============================================ -->
+  <div class="name-screen" id="nameScreen">
+    <div class="name-screen-content">
+      <h2 class="name-screen-title">Enter Birthday Person Name</h2>
+      <div class="input-wrapper">
+        <input type="text" id="nameInput" placeholder="Type name here..." maxlength="30" />
+      </div>
+      <button class="create-btn" id="createSurpriseBtn">Create Surprise</button>
+    </div>
+    <!-- Subtle floating hearts on intro screen -->
+    <div class="hearts-container hearts-intro" id="introHearts"></div>
+  </div>
+
+  <!-- ============================================
+       SCREEN 2: Wish Screen (shown after Create Surprise)
+       ============================================ -->
+  <div class="wish-screen hidden" id="wishScreen">
+    <!-- Animated greeting -->
+    <header class="hero">
+      <h1 class="hero-title">
+        <span class="hero-title-main">Happy Birthday</span>
+        <span class="hero-title-name" id="birthdayName"></span>
+        <span class="hero-cake">🎂</span>
+      </h1>
+      <p class="hero-subtitle">Wishing you a day as magical and beautiful as your smile.</p>
+    </header>
+
+    <!-- Floating hearts - pulse, rotate, glow -->
+    <div class="hearts-container" id="heartsContainer"></div>
+
+    <!-- Tap anywhere hint -->
+    <p class="tap-hint hidden" id="tapHint">Tap anywhere on screen to start slideshow ✨</p>
+
+    <!-- Photo Upload -->
+    <section class="upload-section" id="uploadSection">
+      <label class="upload-btn" for="photoInput">Upload Memories 📸</label>
+      <input type="file" id="photoInput" accept="image/*" multiple hidden />
+    </section>
+
+    <!-- Photo Gallery - cute shape frames -->
+    <section class="photo-gallery hidden" id="photoGallery"></section>
+
+    <!-- Heart click popup - random photo in heart frame with sparkles -->
+    <div class="photo-popup hidden" id="photoPopup">
+      <div class="photo-frame photo-frame-heart">
+        <img id="popupPhotoImg" src="" alt="Birthday memory" />
+        <div class="photo-glow"></div>
+        <div class="sparkles">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <button class="close-popup" id="closePopupBtn" aria-label="Close">×</button>
+    </div>
+
+    <!-- Full screen slideshow - 10 sec, slides from random directions -->
+    <div class="slideshow-overlay hidden" id="slideshowOverlay">
+      <div class="slideshow-container" id="slideshowContainer"></div>
+    </div>
+
+    <!-- Custom text for Big Surprise -->
+    <section class="custom-surprise" id="customSurprise">
+      <label class="custom-label" for="customSurpriseTitle">Big Surprise Title</label>
+      <input
+        id="customSurpriseTitle"
+        type="text"
+        maxlength="40"
+        placeholder="You Are Special ❤️"
+      />
+      <label class="custom-label" for="customSurpriseBody">Optional Message</label>
+      <textarea
+        id="customSurpriseBody"
+        maxlength="140"
+        rows="2"
+        placeholder="Write your own wish... (emotional and sweet)"
+      ></textarea>
+    </section>
+
+    <!-- Big Surprise button - floating -->
+    <button class="surprise-btn floating" id="surpriseBtn">Big Surprise 🎁</button>
+
+    <!-- Share button -->
+    <button class="share-btn floating" id="shareBtn">Share This Wish 💌</button>
+
+    <!-- Share modal - shows link and copy status -->
+    <div class="share-modal hidden" id="shareModal">
+      <div class="share-modal-content">
+        <p class="share-modal-text" id="shareModalText">Link Copied Successfully!</p>
+        <input type="text" id="shareLinkInput" class="share-link-input hidden" readonly />
+      </div>
+    </div>
+
+    <!-- Final message after Big Surprise -->
+    <div class="final-message hidden" id="finalMessage">
+      <div class="final-message-inner">
+        <h2 class="final-message-text" id="finalMessageTitle">You Are Special ❤️</h2>
+        <p class="final-message-body" id="finalMessageBody"></p>
+      </div>
+    </div>
+
+    <!-- Music -->
+    <audio id="bgMusic" loop>
+      <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2023/06/15/audio_1cd7f2f9b6.mp3?filename=romantic-piano-ambient-14621.mp3" type="audio/mpeg" />
+    </audio>
+    <button class="music-btn floating" id="musicToggleBtn" aria-label="Toggle music">
+      <span class="music-icon">▶</span>
+    </button>
+
+    <!-- Confetti layer -->
+    <div class="confetti-layer" id="confettiLayer"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
