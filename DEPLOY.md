@@ -1,30 +1,32 @@
-# Birthday Wish - Deploy to Render
+# Birthday Wish - Deploy to Vercel
 
-## Quick Deploy
+## Quick Deploy (Git Integration)
 
 1. **Push this project to GitHub** (create a repo and push)
-2. Go to [dashboard.render.com](https://dashboard.render.com)
-3. Click **New** → **Static Site**
+2. Go to [vercel.com](https://vercel.com)
+3. Click **Add New...** → **Project**
 4. Connect your GitHub repo
 5. Settings:
-   - **Name:** birthday-wish (or any name)
-   - **Branch:** main (or your default branch)
+   - **Framework Preset:** Other (it will detect static files)
    - **Build Command:** `echo "No build required"` (or leave blank)
-   - **Publish Directory:** `.` (root)
-6. Click **Create Static Site**
+   - **Output Directory:** `.` (root)
+6. Click **Deploy**
 
-Your site will be live at `https://<your-service>.onrender.com`
+Your site will be live at `https://<your-project>.vercel.app`
 
 ---
 
-## Using render.yaml (Blueprint)
+## Deploy using Vercel CLI
 
-If your repo has `render.yaml` in the root:
+If you have [Vercel CLI](https://vercel.com/docs/cli) installed:
 
-1. Go to [dashboard.render.com](https://dashboard.render.com)
-2. Click **New** → **Blueprint**
-3. Connect your repo
-4. Render will detect `render.yaml` and create the static site
+```bash
+# Login to Vercel
+vercel login
+
+# Deploy from root
+vercel --prod
+```
 
 ---
 
@@ -63,7 +65,7 @@ Then open: http://localhost:3000
 After deploy, share links work like:
 
 ```
-https://your-site.onrender.com/?name=Sarah&title=You%20Are%20Special&body=Happy%20Birthday!
+https://your-site.vercel.app/?name=Sarah&title=You%20Are%20Special&body=Happy%20Birthday!
 ```
 
 Recipients open directly to the wish screen with name and custom message pre-filled.
