@@ -41,6 +41,21 @@ if (creatorForm) {
     const successPopup = document.getElementById('success-popup');
     const shareLinkInput = document.getElementById('share-link');
     const copyBtn = document.getElementById('copy-btn');
+    const musicInput = document.getElementById('music');
+    const musicFilenameDisplay = document.getElementById('music-filename');
+
+    // Update Music Filename Display
+    if(musicInput) {
+        musicInput.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                musicFilenameDisplay.innerText = e.target.files[0].name;
+                musicFilenameDisplay.classList.add('text-primary');
+            } else {
+                musicFilenameDisplay.innerText = "Tap to select an audio file";
+                musicFilenameDisplay.classList.remove('text-primary');
+            }
+        });
+    }
 
     // Floating Emoji Micro Animations
     setInterval(() => {
@@ -95,6 +110,7 @@ if (creatorForm) {
         const name = document.getElementById('name').value.trim();
         const message = document.getElementById('message').value.trim();
         const files = Array.from(photosInput.files).slice(0, 10);
+        const musicFile = musicInput && musicInput.files.length > 0 ? musicInput.files[0] : null;
 
         if (files.length === 0) {
             alert("Please upload at least one photo!");
@@ -113,8 +129,28 @@ if (creatorForm) {
 
         try {
             const photoUrls = [];
+            let musicUrl = null;
             const timestamp = Date.now();
+            const safeNameFolder = name.replace(/[^a-zA-Z0-9]/g, '_');
 
+            // 1. Upload Music (If selected)
+            if (musicFile) {
+                const musicExt = musicFile.name.split('.').pop();
+                const musicFileName = `music_${timestamp}.${musicExt}`;
+                
+                const { error: musicError } = await supabaseClient.storage
+                    .from('birthday-music')
+                    .upload(`${safeNameFolder}/${musicFileName}`, musicFile, { cacheControl: '3600', upsert: false });
+                
+                if (musicError) throw new Error("Music upload failed. Ensure 'birthday-music' bucket is public and RLS is enabled correctly.");
+                
+                const { data: musicPublicUrlData } = supabaseClient.storage
+                    .from('birthday-music')
+                    .getPublicUrl(`${safeNameFolder}/${musicFileName}`);
+                musicUrl = musicPublicUrlData.publicUrl;
+            }
+
+            // 2. Upload Photos
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const fileExt = file.name.split('.').pop();
@@ -122,19 +158,25 @@ if (creatorForm) {
 
                 const { data, error } = await supabaseClient.storage
                     .from('birthday-photos')
-                    .upload(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`, file, { cacheControl: '3600', upsert: false });
+                    .upload(`${safeNameFolder}/${fileName}`, file, { cacheControl: '3600', upsert: false });
 
                 if (error) throw new Error("Upload failed. Ensure bucket is correctly configured.");
 
                 const { data: publicUrlData } = supabaseClient.storage
                     .from('birthday-photos')
-                    .getPublicUrl(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`);
+                    .getPublicUrl(`${safeNameFolder}/${fileName}`);
                 photoUrls.push(publicUrlData.publicUrl);
             }
 
+            // 3. Insert Database Record
             const { data: dbData, error: dbError } = await supabaseClient
                 .from('surprises')
-                .insert([{ name: name, wish_message: message, photo_urls: photoUrls }])
+                .insert([{ 
+                    name: name, 
+                    wish_message: message, 
+                    photo_urls: photoUrls,
+                    music_url: musicUrl
+                }])
                 .select();
 
             if (dbError) throw new Error("Failed to save surprise data.");
@@ -208,13 +250,28 @@ if (viewerBody) {
     let loadedPhotos = [];
     let loadedMessage = "";
 
+    // Safely and Softly Fade in Audio 
+    function fadeAudioIn(audio, targetVolume = 0.4, step = 0.05, interval = 200) {
+        audio.volume = 0;
+        audio.play().catch(e => console.log("Audio play blocked by browser. User must interact first.", e));
+        
+        let fadeAudio = setInterval(function () {
+            if (audio.volume < targetVolume - step) {
+                audio.volume += step;
+            } else {
+                audio.volume = targetVolume;
+                clearInterval(fadeAudio);
+            }
+        }, interval);
+    }
+
     musicBtn.addEventListener('click', () => {
         if (isPlaying) {
             bgMusic.pause();
             musicBtn.innerHTML = '♪ Play Music';
             isPlaying = false;
         } else {
-            bgMusic.play().catch(e => console.log("Audio play failed:", e));
+            fadeAudioIn(bgMusic, 0.4);
             musicBtn.innerHTML = '⏸ Pause Music';
             isPlaying = true;
         }
@@ -238,6 +295,12 @@ if (viewerBody) {
             bdayNameSpan.innerText = data.name;
             loadedPhotos = data.photo_urls || [];
             loadedMessage = data.wish_message || "";
+            
+            // Apply custom music if user uploaded it
+            if (data.music_url) {
+                bgMusic.src = data.music_url;
+                bgMusic.load();
+            }
 
             loader.classList.add('hidden');
             experienceDiv.classList.remove('hidden');
@@ -279,7 +342,7 @@ if (viewerBody) {
                 const y = (rect.top + rect.height / 2) / window.innerHeight;
                 if(window.confetti) {
                     confetti({
-                        particleCount: 40,
+                        particleCount: 200,
                         spread: 60,
                         origin: { x, y },
                         colors: ['#ff99cc', '#ffffff', '#ffafbd'],
@@ -312,9 +375,9 @@ if (viewerBody) {
         // Temporarily disable scroll during the ultra slideshow animation
         document.body.style.overflow = 'hidden';
         
-        // Ensure music plays during slideshow
+        // Ensure music plays delicately during slideshow
         if (!isPlaying) {
-            bgMusic.play().catch(e=>console.log(e));
+            fadeAudioIn(bgMusic, 0.4);
             musicBtn.innerHTML = '⏸ Pause Music';
             isPlaying = true;
         }
@@ -348,7 +411,7 @@ if (viewerBody) {
             // Subtle sparkle around text
             setTimeout(() => {
                 if(window.confetti) {
-                    confetti({ particleCount: 35, spread: 80, origin: { y: 0.7 }, colors: ['#ffffff', '#ff99cc'], disableForReducedMotion: true });
+                    confetti({ particleCount: 95, spread: 80, origin: { y: 0.7 }, colors: ['#ffffff', '#ff99cc'], disableForReducedMotion: true });
                 }
             }, 1000);
         }
@@ -358,10 +421,10 @@ if (viewerBody) {
             const end = Date.now() + duration;
             (function frame() {
                 confetti({
-                    particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff99cc', '#ffffff']
+                    particleCount: 50, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff99cc', '#ffffff']
                 });
                 confetti({
-                    particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff99cc', '#ffffff']
+                    particleCount: 50, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff99cc', '#ffffff']
                 });
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
@@ -383,7 +446,7 @@ if (viewerBody) {
             setTimeout(() => {
                 if(window.confetti) {
                     confetti({
-                        particleCount: 50,
+                        particleCount: 200,
                         spread: 120,
                         origin: { y: 0.5 },
                         colors: ['#ffffff', '#ff99cc', '#ffd1dc'],
