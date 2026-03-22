@@ -13,6 +13,10 @@
     {
       "src": "script.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "view.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
