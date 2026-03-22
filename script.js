@@ -3,10 +3,10 @@
 const SUPABASE_URL = 'https://snjifhxhorgsqwgzfhml.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuamlmaHhob3Jnc3F3Z3pmaG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODAyNTYsImV4cCI6MjA4OTc1NjI1Nn0.wdxKWZAsYW0RYr_2ONr_oiSLX2P8QnYeOT3qaksUGtQ';
 
-let supabase;
+let supabaseClient;
 if (typeof window.supabase !== 'undefined') {
     // Initialize Supabase Client
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 // ====== CREATOR PAGE LOGIC ======
@@ -67,7 +67,7 @@ if (creatorForm) {
                 const fileName = `${timestamp}_${i}.${fileExt}`;
                 
                 // Note: bucket 'birthday-photos' must exist and be public
-                const { data, error } = await supabase.storage
+                const { data, error } = await supabaseClient.storage
                     .from('birthday-photos')
                     .upload(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`, file, { cacheControl: '3600', upsert: false });
                 
@@ -77,7 +77,7 @@ if (creatorForm) {
                 }
                 
                 // Get the public URL for the uploaded file
-                const { data: publicUrlData } = supabase.storage
+                const { data: publicUrlData } = supabaseClient.storage
                     .from('birthday-photos')
                     .getPublicUrl(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`);
                     
@@ -85,7 +85,7 @@ if (creatorForm) {
             }
 
             // Save the surprise details in Supabase Database 'surprises' table
-            const { data: dbData, error: dbError } = await supabase
+            const { data: dbData, error: dbError } = await supabaseClient
                 .from('surprises')
                 .insert([{ name: name, photo_urls: photoUrls }])
                 .select();
@@ -156,7 +156,7 @@ if (viewerScreen) {
 
         try {
             // Fetch surprise from DB
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('surprises')
                 .select('*')
                 .eq('id', surpriseId)
