@@ -257,6 +257,9 @@ if (viewerBody) {
 
     // Interactive Floating Hearts
     function startHearts() {
+        // Unlock scroll after page load
+        document.body.style.overflowY = 'auto';
+
         if(loadedPhotos.length === 0) return;
         
         setInterval(() => {
@@ -306,6 +309,9 @@ if (viewerBody) {
         heartsContainer.classList.add('hidden');
         slideshowOverlay.classList.remove('hidden');
         
+        // Temporarily disable scroll during the ultra slideshow animation
+        document.body.style.overflow = 'hidden';
+        
         // Ensure music plays during slideshow
         if (!isPlaying) {
             bgMusic.play().catch(e=>console.log(e));
@@ -324,7 +330,15 @@ if (viewerBody) {
         
         // Show Final Screen after slideshow finishes
         slideshowContainer.innerHTML = '';
+        slideshowOverlay.classList.add('hidden'); // Clear overlay so interaction is possible
         finalScreen.classList.remove('hidden');
+        
+        // Automatically re-enable scrolling so user can scroll down and read custom message fully
+        document.body.style.overflow = ''; 
+        document.body.style.overflowY = 'auto';
+        
+        // Ensure screen focuses at the top of the final screen
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         // Render custom message
         if (loadedMessage.length > 0 && customMessageCard && customMessageText) {
