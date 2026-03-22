@@ -8,7 +8,6 @@ if (typeof window.supabase !== 'undefined') {
     // Initialize Supabase Client
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
-
 // ====== CREATOR PAGE LOGIC ======
 const creatorForm = document.getElementById('creator-form');
 if (creatorForm) {
