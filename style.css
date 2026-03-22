@@ -151,3 +151,21 @@
 
 .spinner-magical { width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(from 0deg, #ff99cc, #913e6c, #89f7fe, #ff99cc); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff 0); animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Custom Message Animations */
+.animate-message-entrance {
+    animation: messageEntrance 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes messageEntrance {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-text-reveal {
+    opacity: 0;
+    animation: textRevealFade 2s ease-out 1s forwards;
+}
+@keyframes textRevealFade {
+    0% { opacity: 0; text-shadow: 0 0 40px rgba(255,255,255,0); }
+    100% { opacity: 1; text-shadow: 0 0 15px rgba(255,153,204,0.6); }
+}

@@ -93,6 +93,7 @@ if (creatorForm) {
     creatorForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('name').value.trim();
+        const message = document.getElementById('message').value.trim();
         const files = Array.from(photosInput.files).slice(0, 10);
 
         if (files.length === 0) {
@@ -133,7 +134,7 @@ if (creatorForm) {
 
             const { data: dbData, error: dbError } = await supabaseClient
                 .from('surprises')
-                .insert([{ name: name, photo_urls: photoUrls }])
+                .insert([{ name: name, wish_message: message, photo_urls: photoUrls }])
                 .select();
 
             if (dbError) throw new Error("Failed to save surprise data.");
@@ -201,8 +202,11 @@ if (viewerBody) {
     const slideshowOverlay = document.getElementById('slideshow-overlay');
     const slideshowContainer = document.getElementById('slideshow-image-container');
     const finalScreen = document.getElementById('final-screen');
+    const customMessageText = document.getElementById('custom-message-text');
+    const customMessageCard = document.getElementById('custom-message-card');
 
     let loadedPhotos = [];
+    let loadedMessage = "";
 
     musicBtn.addEventListener('click', () => {
         if (isPlaying) {
@@ -233,6 +237,7 @@ if (viewerBody) {
 
             bdayNameSpan.innerText = data.name;
             loadedPhotos = data.photo_urls || [];
+            loadedMessage = data.wish_message || "";
 
             loader.classList.add('hidden');
             experienceDiv.classList.remove('hidden');
@@ -320,6 +325,19 @@ if (viewerBody) {
         // Show Final Screen after slideshow finishes
         slideshowContainer.innerHTML = '';
         finalScreen.classList.remove('hidden');
+        
+        // Render custom message
+        if (loadedMessage.length > 0 && customMessageCard && customMessageText) {
+            customMessageText.innerText = loadedMessage;
+            customMessageCard.classList.remove('hidden');
+            
+            // Subtle sparkle around text
+            setTimeout(() => {
+                if(window.confetti) {
+                    confetti({ particleCount: 35, spread: 80, origin: { y: 0.7 }, colors: ['#ffffff', '#ff99cc'], disableForReducedMotion: true });
+                }
+            }, 1000);
+        }
         
         if (window.confetti) {
             const duration = 5 * 1000;

@@ -66,12 +66,24 @@
         <div id="slideshow-image-container" class="w-full h-full relative flex items-center justify-center perspective-1000"></div>
     </div>
 
-    <!-- Final Message -->
-    <div id="final-screen" class="hidden fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 backdrop-blur-2xl">
-        <h1 class="font-['Dancing_Script'] text-[5rem] md:text-[8rem] text-white drop-shadow-[0_0_60px_#ff99cc] animate-heartbeat text-center px-4 leading-tight">
+    <!-- Final Message & Custom Wish -->
+    <div id="final-screen" class="hidden fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 backdrop-blur-2xl px-6 pb-10">
+        <h1 class="font-['Dancing_Script'] text-[4rem] sm:text-[5rem] md:text-[7rem] text-white drop-shadow-[0_0_60px_#ff99cc] animate-heartbeat text-center leading-tight mb-8">
             You mean<br>the world to me! ❤️
         </h1>
-        <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
+        
+        <!-- Custom Message Card -->
+        <div id="custom-message-card" class="hidden w-full max-w-2xl bg-white/10 backdrop-blur-3xl border border-white/40 p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(255,153,204,0.3)] animate-message-entrance relative overflow-hidden group">
+            <!-- Glowing pastel border effect -->
+            <div class="absolute inset-0 border-glow-anim opacity-50 z-0"></div>
+            <!-- Floating mini hearts around message -->
+            <div class="absolute top-2 left-6 text-pink-300 animate-float-text text-2xl drop-shadow-[0_0_10px_#ff99cc]">💖</div>
+            <div class="absolute bottom-6 right-8 text-purple-300 animate-float-text text-xl drop-shadow-[0_0_10px_#ddc8ff]" style="animation-delay: 1.5s;">✨</div>
+            
+            <p id="custom-message-text" class="relative z-10 text-center font-['Dancing_Script'] text-3xl md:text-5xl bg-gradient-to-r from-pink-300 via-purple-300 to-orange-200 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(255,153,204,0.6)] animate-text-reveal leading-relaxed"></p>
+        </div>
+
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none z-0"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
