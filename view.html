@@ -1,58 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>A Special Surprise for You</title>
+    <!-- Stitch Tailwind Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="style.css">
+    <script id="tailwind-config">
+        tailwind.config = { theme: { extend: { colors: { "primary": "#913e6c", "primary-fixed": "#ff99cc" } } } }
+    </script>
 </head>
-<body class="viewer-body">
-    <button id="music-btn" class="floating-btn">♪ Play Music</button>
+<body class="bg-mesh font-['Plus_Jakarta_Sans'] text-white min-h-screen relative overflow-hidden viewer-body">
+    
+    <button id="music-btn" class="fixed bottom-8 right-8 bg-white/30 backdrop-blur-xl border border-white/50 px-6 py-4 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.2)] z-50 hover:bg-white/50 hover:scale-105 active:scale-95 transition-all font-bold tracking-wide flex items-center gap-3 text-white text-lg">
+        ♪ Play Music
+    </button>
     <audio id="bg-music" loop>
         <source src="https://cdn.pixabay.com/download/audio/2023/06/15/audio_1cd7f2f9b6.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="loader" class="screen flex-center">
-        <div class="heart-pulse">❤️</div>
-        <p>Loading your surprise...</p>
+    <div id="loader" class="absolute inset-0 flex flex-col items-center justify-center z-40 bg-black/30 backdrop-blur-md">
+        <div class="heart-pulse text-8xl drop-shadow-2xl">💖</div>
+        <p class="mt-6 font-bold text-2xl animate-pulse tracking-wide drop-shadow-lg">Opening your surprise...</p>
     </div>
 
     <!-- Error Screen -->
-    <div id="error-screen" class="screen flex-center hidden">
-        <h2>Oops!</h2>
-        <p>We couldn't find this surprise. The link might be broken.</p>
+    <div id="error-screen" class="hidden absolute inset-0 flex flex-col items-center justify-center z-40 bg-black/90">
+        <h2 class="text-6xl font-bold text-red-400 mb-4 font-['Dancing_Script']">Oops!</h2>
+        <p class="text-xl">The magic link seems broken or incomplete.</p>
     </div>
 
-    <!-- Main Viewer Experience -->
-    <div id="experience" class="hidden screen">
-        <h1 class="glow-text">Happy Birthday, <br><span id="bday-name">Name</span>!</h1>
-        <p class="subtitle fade-in">Tap anywhere to start the full magic ✨</p>
-        <p class="subtitle fade-in" style="font-size: 0.9rem; margin-top: 5px;">(Or catch the floating hearts for a sneak peek!)</p>
+    <!-- Main Experience Trigger -->
+    <div id="experience" class="hidden absolute inset-0 flex flex-col items-center justify-center z-10 p-6 pointer-events-none">
         
-        <!-- Hearts Container -->
-        <div id="hearts-container"></div>
+        <h1 class="font-['Dancing_Script'] text-7xl md:text-9xl text-center drop-shadow-[0_10px_30px_rgba(255,153,204,1)] animate-float-text leading-tight">
+            Happy Birthday,<br>
+            <span id="bday-name" class="text-white drop-shadow-[0_0_40px_rgba(255,255,255,1)]">Name</span>!
+        </h1>
+        
+        <button id="preview-animation-btn" class="mt-16 pointer-events-auto jelly-btn bg-white/20 hover:bg-white/40 backdrop-blur-2xl border-2 border-white px-12 py-6 rounded-full text-2xl font-bold shadow-[0_0_50px_rgba(255,153,204,0.8)] transition-all animate-pulse-gentle flex items-center gap-3 text-white">
+            <span>✨</span> Start The Magic <span>✨</span>
+        </button>
+        
+        <p class="mt-8 text-xl font-medium bg-black/20 px-6 py-2 rounded-full backdrop-blur-sm text-center shadow-inner">(Try catching the floating hearts first!)</p>
+    </div>
 
-        <!-- Heart Click Photo Frame -->
-        <div id="photo-frame-popup" class="hidden">
-            <div class="heart-frame">
-                <img id="frame-image" src="" alt="Memory">
+    <!-- Floating Interactive Hearts Container -->
+    <div id="hearts-container" class="absolute inset-0 pointer-events-none z-20"></div>
+    <div id="particles-container" class="absolute inset-0 pointer-events-none z-0"></div>
+
+    <!-- Heart Click Photo Frame -->
+    <div id="photo-frame-popup" class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-xl pointer-events-auto transition-opacity duration-300">
+        <div class="relative scale-up group">
+            <div class="w-80 h-80 bg-white/20 backdrop-blur-3xl p-4 rounded-3xl -rotate-3 hover:rotate-0 transition-transform shadow-[0_20px_60px_rgba(255,153,204,0.6)] border border-white/50">
+                <img id="frame-image" src="" alt="Memory" class="w-full h-full object-cover rounded-2xl shadow-inner">
             </div>
-            <button id="close-frame-btn" class="close-btn">×</button>
+            <button id="close-frame-btn" class="absolute -top-6 -right-6 bg-white text-primary rounded-full w-14 h-14 font-black text-3xl shadow-2xl hover:scale-125 transition-transform flex justify-center items-center jelly-btn">×</button>
         </div>
     </div>
 
-    <!-- Full Screen Slideshow -->
-    <div id="slideshow-overlay" class="hidden">
-        <div id="slideshow-image-container"></div>
+    <!-- Ultra Attractive Slideshow -->
+    <div id="slideshow-overlay" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-3xl overflow-hidden pointer-events-auto">
+        <div id="slideshow-image-container" class="w-full h-full relative flex items-center justify-center perspective-1000"></div>
     </div>
 
-    <!-- Confetti & Final Message -->
-    <div id="final-screen" class="hidden screen flex-center">
-        <h1 class="glow-text animate-pulse" style="z-index: 410;">You mean the world to me! ❤️</h1>
+    <!-- Final Message -->
+    <div id="final-screen" class="hidden fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 backdrop-blur-2xl">
+        <h1 class="font-['Dancing_Script'] text-[5rem] md:text-[8rem] text-white drop-shadow-[0_0_60px_#ff99cc] animate-heartbeat text-center px-4 leading-tight">
+            You mean<br>the world to me! ❤️
+        </h1>
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

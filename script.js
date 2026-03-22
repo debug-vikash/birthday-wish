@@ -5,30 +5,85 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 let supabaseClient;
 if (typeof window.supabase !== 'undefined') {
-    // Initialize Supabase Client
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
+
+// Utilities
+const SHAPES = ['clip-heart', 'shape-circle', 'shape-blob', 'shape-diamond', 'shape-star'];
+const DIRECTIONS = ['slide-enter-left', 'slide-enter-right', 'slide-enter-top', 'slide-enter-bottom'];
+
+// Global background particles
+function createBackgroundParticles() {
+    const container = document.getElementById('particles-container');
+    if(!container) return;
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 80 + 20;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${Math.random() * 100}vw`;
+        p.style.animationDuration = `${Math.random() * 10 + 10}s`;
+        p.style.animationDelay = `${Math.random() * 5}s`;
+        container.appendChild(p);
+    }
+}
+createBackgroundParticles();
+
 // ====== CREATOR PAGE LOGIC ======
 const creatorForm = document.getElementById('creator-form');
 if (creatorForm) {
     const photosInput = document.getElementById('photos');
     const previewContainer = document.getElementById('preview-container');
+    const mobilePreview = document.getElementById('mobile-preview');
     const loadingDiv = document.getElementById('loading');
     const submitBtn = document.getElementById('submit-btn');
     const successPopup = document.getElementById('success-popup');
     const shareLinkInput = document.getElementById('share-link');
     const copyBtn = document.getElementById('copy-btn');
-    
+
+    // Floating Emoji Micro Animations
+    setInterval(() => {
+        if (document.hidden) return;
+        const emojis = ['❤️', '✨', '🎉', '💖', '🌟'];
+        const el = document.createElement('div');
+        el.className = 'absolute text-3xl animate-float-text z-50 pointer-events-none opacity-80';
+        el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = `${Math.random() * 90}vw`;
+        el.style.top = `${Math.random() * 90}vh`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+    }, 2500);
+
     // Preview Photos before Upload
     photosInput.addEventListener('change', () => {
-        previewContainer.innerHTML = '';
-        const files = Array.from(photosInput.files).slice(0, 10); // max 10
-        files.forEach(file => {
+        if(previewContainer) previewContainer.innerHTML = '';
+        if(mobilePreview) mobilePreview.innerHTML = '';
+        
+        const files = Array.from(photosInput.files).slice(0, 10);
+        files.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = e => {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                previewContainer.appendChild(img);
+                // Desktop Floating Preview
+                if(previewContainer) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+                    img.className = `preview-card ${randomShape}`;
+                    // Random starting position and delay
+                    img.style.left = `${Math.random() * 70 + 10}%`;
+                    img.style.top = `${Math.random() * 60 + 10}%`;
+                    img.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 5}s`;
+                    previewContainer.appendChild(img);
+                }
+                
+                // Mobile Inline Preview
+                if(mobilePreview) {
+                    const mImg = document.createElement('img');
+                    mImg.src = e.target.result;
+                    mImg.className = 'mobile-preview-img object-cover rounded-xl';
+                    mobilePreview.appendChild(mImg);
+                }
             };
             reader.readAsDataURL(file);
         });
@@ -37,287 +92,287 @@ if (creatorForm) {
     // Form Submit
     creatorForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
         const name = document.getElementById('name').value.trim();
         const files = Array.from(photosInput.files).slice(0, 10);
-        
+
         if (files.length === 0) {
             alert("Please upload at least one photo!");
             return;
         }
 
-        if (!SUPABASE_URL) {
-            alert("Please update SUPABASE_URL and SUPABASE_ANON_KEY in script.js to continue.");
+        if (!SUPABASE_URL || !supabaseClient) {
+            alert("Supabase is not configured properly.");
             return;
         }
 
         // Show loading state
         submitBtn.disabled = true;
+        creatorForm.style.opacity = '0.5';
         loadingDiv.classList.remove('hidden');
 
         try {
             const photoUrls = [];
             const timestamp = Date.now();
-            
-            // Upload each image to Supabase Storage 'birthday-photos' bucket
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${timestamp}_${i}.${fileExt}`;
-                
-                // Note: bucket 'birthday-photos' must exist and be public
+
                 const { data, error } = await supabaseClient.storage
                     .from('birthday-photos')
                     .upload(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`, file, { cacheControl: '3600', upsert: false });
-                
-                if (error) {
-                    console.error("Upload error:", error);
-                    throw new Error("Failed to upload image. Does the bucket 'birthday-photos' exist?");
-                }
-                
-                // Get the public URL for the uploaded file
+
+                if (error) throw new Error("Upload failed. Ensure bucket is correctly configured.");
+
                 const { data: publicUrlData } = supabaseClient.storage
                     .from('birthday-photos')
                     .getPublicUrl(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`);
-                    
                 photoUrls.push(publicUrlData.publicUrl);
             }
 
-            // Save the surprise details in Supabase Database 'surprises' table
             const { data: dbData, error: dbError } = await supabaseClient
                 .from('surprises')
                 .insert([{ name: name, photo_urls: photoUrls }])
                 .select();
-                
-            if (dbError) {
-                console.error("Database insert error:", dbError);
-                throw new Error("Failed to save data. Does the table 'surprises' exist?");
-            }
-            
+
+            if (dbError) throw new Error("Failed to save surprise data.");
+
             const surpriseId = dbData[0].id;
-            
-            // Output link
             const link = `${window.location.origin}/view.html?id=${surpriseId}`;
             shareLinkInput.value = link;
-            
+
             loadingDiv.classList.add('hidden');
+            creatorForm.classList.add('hidden');
             successPopup.classList.remove('hidden');
-            
+
+            if (previewContainer) previewContainer.innerHTML = ''; // Clear floating previews to focus on success
+
         } catch (error) {
             console.error(error);
             alert("Error: " + error.message);
             submitBtn.disabled = false;
+            creatorForm.style.opacity = '1';
             loadingDiv.classList.add('hidden');
         }
     });
 
-    // Copy to clipboard
     copyBtn.addEventListener('click', () => {
         shareLinkInput.select();
-        document.execCommand('copy');
-        copyBtn.textContent = 'Copied! ✨';
-        setTimeout(() => copyBtn.textContent = 'Copy Link', 2000);
+        shareLinkInput.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = "Copied! ✨";
+            copyBtn.classList.add('bg-green-500');
+            // Trigger Confetti
+            if (window.confetti) {
+                confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#ff99cc', '#913e6c', '#ffffff'] });
+            }
+            setTimeout(() => {
+                copyBtn.innerText = originalText;
+                copyBtn.classList.remove('bg-green-500');
+            }, 2000);
+        });
     });
 }
 
 // ====== VIEWER PAGE LOGIC ======
-const viewerScreen = document.getElementById('experience');
-if (viewerScreen) {
+const viewerBody = document.querySelector('.viewer-body');
+if (viewerBody) {
     const urlParams = new URLSearchParams(window.location.search);
     const surpriseId = urlParams.get('id');
+    
     const loader = document.getElementById('loader');
     const errorScreen = document.getElementById('error-screen');
+    const experienceDiv = document.getElementById('experience');
+    const bdayNameSpan = document.getElementById('bday-name');
+    const heartsContainer = document.getElementById('hearts-container');
+    const photoFramePopup = document.getElementById('photo-frame-popup');
+    const frameImage = document.getElementById('frame-image');
+    const closeFrameBtn = document.getElementById('close-frame-btn');
     
-    let surpriseData = null;
-    let musicPlaying = false;
-    const bgMusic = document.getElementById('bg-music');
+    // Music
     const musicBtn = document.getElementById('music-btn');
+    const bgMusic = document.getElementById('bg-music');
+    let isPlaying = false;
 
-    // Music toggle
-    musicBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Stop click from bubbling up to the slideshow trigger
-        if (musicPlaying) {
+    // Slideshow
+    const previewBtn = document.getElementById('preview-animation-btn');
+    const slideshowOverlay = document.getElementById('slideshow-overlay');
+    const slideshowContainer = document.getElementById('slideshow-image-container');
+    const finalScreen = document.getElementById('final-screen');
+
+    let loadedPhotos = [];
+
+    musicBtn.addEventListener('click', () => {
+        if (isPlaying) {
             bgMusic.pause();
             musicBtn.innerHTML = '♪ Play Music';
+            isPlaying = false;
         } else {
-            bgMusic.play().catch(err => console.log("Audio play blocked:", err));
-            musicBtn.innerHTML = '❚❚ Pause Music';
+            bgMusic.play().catch(e => console.log("Audio play failed:", e));
+            musicBtn.innerHTML = '⏸ Pause Music';
+            isPlaying = true;
         }
-        musicPlaying = !musicPlaying;
     });
 
     async function initViewer() {
-        if (!surpriseId) {
-            loader.classList.add('hidden');
-            errorScreen.classList.remove('hidden');
+        if (!surpriseId || !supabaseClient) {
+            showError();
             return;
         }
 
         try {
-            // Fetch surprise from DB
             const { data, error } = await supabaseClient
                 .from('surprises')
                 .select('*')
                 .eq('id', surpriseId)
                 .single();
 
-            if (error || !data) throw error || new Error("Surprise not found");
-            
-            surpriseData = data;
-            document.getElementById('bday-name').textContent = data.name;
-            
+            if (error || !data) throw error;
+
+            bdayNameSpan.innerText = data.name;
+            loadedPhotos = data.photo_urls || [];
+
             loader.classList.add('hidden');
-            viewerScreen.classList.remove('hidden');
-            
-            startFloatingHearts();
+            experienceDiv.classList.remove('hidden');
+
+            startHearts();
             
         } catch (error) {
             console.error(error);
-            loader.classList.add('hidden');
-            errorScreen.classList.remove('hidden');
+            showError();
         }
     }
 
-    // 1. Floating Hearts
-    function startFloatingHearts() {
-        const container = document.getElementById('hearts-container');
-        const heartIcons = ['❤️', '💖', '💝', '💕', '💗', '💓', '✨'];
+    function showError() {
+        loader.classList.add('hidden');
+        errorScreen.classList.remove('hidden');
+    }
+
+    // Interactive Floating Hearts
+    function startHearts() {
+        if(loadedPhotos.length === 0) return;
         
         setInterval(() => {
             const heart = document.createElement('div');
-            heart.classList.add('floating-heart');
-            heart.textContent = heartIcons[Math.floor(Math.random() * heartIcons.length)];
-            heart.style.left = `${Math.random() * 90}vw`;
-            heart.style.animationDuration = `${6 + Math.random() * 6}s`;
+            heart.className = 'heart-particle';
+            heart.innerText = ['💖', '💕', '💗', '💓', '💝'][Math.floor(Math.random()*5)];
+            heart.style.left = Math.random() * 90 + 'vw';
             
-            const scale = 0.6 + Math.random() * 0.8;
-            heart.style.transform = `scale(${scale})`;
+            // Random duration 8-15s
+            const duration = Math.random() * 7 + 8;
+            heart.style.animationDuration = duration + 's';
             
-            container.appendChild(heart);
-            
-            // Interaction: clicking a heart shows a random photo
             heart.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showRandomPhoto();
-                heart.style.animationPlayState = 'paused';
-                heart.style.opacity = '0';
-                setTimeout(() => heart.remove(), 300);
+                // Heart explosion effect using confetti
+                const rect = heart.getBoundingClientRect();
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+                if(window.confetti) {
+                    confetti({
+                        particleCount: 40,
+                        spread: 60,
+                        origin: { x, y },
+                        colors: ['#ff99cc', '#ffffff', '#ffafbd'],
+                        disableForReducedMotion: true
+                    });
+                }
+                heart.remove();
+                
+                // Show photo popup
+                const randomPhoto = loadedPhotos[Math.floor(Math.random() * loadedPhotos.length)];
+                frameImage.src = randomPhoto;
+                photoFramePopup.classList.remove('hidden');
             });
-
-            // Cleanup
-            setTimeout(() => {
-                if (container.contains(heart)) heart.remove();
-            }, 12000); 
-        }, 600);
+            
+            heartsContainer.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, duration * 1000);
+        }, 1200);   // Spawn a heart every 1.2s
     }
 
-    // 2. Photo Popup Frame
-    const photoFramePopup = document.getElementById('photo-frame-popup');
-    const frameImage = document.getElementById('frame-image');
-    const closeFrameBtn = document.getElementById('close-frame-btn');
-
-    function showRandomPhoto() {
-        if (!surpriseData || surpriseData.photo_urls.length === 0) return;
-        const urls = surpriseData.photo_urls;
-        const randomUrl = urls[Math.floor(Math.random() * urls.length)];
-        frameImage.src = randomUrl;
-        photoFramePopup.classList.remove('hidden');
-    }
-
-    closeFrameBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    closeFrameBtn.addEventListener('click', () => {
         photoFramePopup.classList.add('hidden');
     });
 
-    // 3. Full Screen Slideshow
-    let slideshowStarted = false;
-    document.addEventListener('click', (e) => {
-        // Start slideshow if clicking anywhere EXCEPT on music btn, hearts, or close button
-        if (!viewerScreen.classList.contains('hidden') 
-            && !slideshowStarted 
-            && e.target.id !== 'music-btn' 
-            && !e.target.classList.contains('floating-heart')
-            && !e.target.closest('#photo-frame-popup')) {
-            startSlideshow();
+    // Start Ultra Attractive Slideshow
+    previewBtn.addEventListener('click', () => {
+        experienceDiv.classList.add('hidden');
+        heartsContainer.classList.add('hidden');
+        slideshowOverlay.classList.remove('hidden');
+        
+        // Ensure music plays during slideshow
+        if (!isPlaying) {
+            bgMusic.play().catch(e=>console.log(e));
+            musicBtn.innerHTML = '⏸ Pause Music';
+            isPlaying = true;
         }
+
+        runSlideshow();
     });
 
-    function startSlideshow() {
-        if (!surpriseData || surpriseData.photo_urls.length === 0 || slideshowStarted) return;
-        slideshowStarted = true;
+    async function runSlideshow() {
+        // Iterate through each uploaded photo
+        for (let i = 0; i < loadedPhotos.length; i++) {
+            await showSlidePhoto(loadedPhotos[i]);
+        }
         
-        photoFramePopup.classList.add('hidden'); 
-        const overlay = document.getElementById('slideshow-overlay');
-        const container = document.getElementById('slideshow-image-container');
-        overlay.classList.remove('hidden');
-
-        // Optional: autoplay music on tap if not already playing
-        if (!musicPlaying) {
-            bgMusic.play().catch(() => {});
-            musicPlaying = true;
-            musicBtn.innerHTML = '❚❚ Pause Music';
-        }
-
-        const urls = surpriseData.photo_urls;
-        let index = 0;
-
-        function showNextSlide() {
-            if (index >= urls.length) {
-                // End of slideshow
-                overlay.classList.add('hidden');
-                showConfettiAndFinalMessage();
-                return;
-            }
-
-            container.innerHTML = ''; // clear previous
-            const img = document.createElement('img');
-            img.src = urls[index];
-            img.className = 'slide-item';
-            container.appendChild(img);
-
-            // Small delay to trigger CSS transition
-            setTimeout(() => {
-                img.classList.add('active');
-            }, 50);
-
-            index++;
-            setTimeout(showNextSlide, 3500); // 3.5 seconds per slide
-        }
-
-        showNextSlide();
-    }
-
-    // 4. Confetti and Glow Final Message
-    function showConfettiAndFinalMessage() {
-        const finalScreen = document.getElementById('final-screen');
+        // Show Final Screen after slideshow finishes
+        slideshowContainer.innerHTML = '';
         finalScreen.classList.remove('hidden');
-
-        // Confetti burst from both sides
-        const duration = 4000;
-        const end = Date.now() + duration;
-
-        (function frame() {
-            // Check if user is still on page
-            if (Date.now() < end) {
+        
+        if (window.confetti) {
+            const duration = 5 * 1000;
+            const end = Date.now() + duration;
+            (function frame() {
                 confetti({
-                    particleCount: 5,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 },
-                    colors: ['#ff4d6d', '#ff758f', '#ffffff']
+                    particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff99cc', '#ffffff']
                 });
                 confetti({
-                    particleCount: 5,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 },
-                    colors: ['#ff4d6d', '#ff758f', '#ffffff']
+                    particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff99cc', '#ffffff']
                 });
-                requestAnimationFrame(frame);
-            }
-        }());
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
     }
 
-    // Initialize Viewer
+    function showSlidePhoto(url) {
+        return new Promise(resolve => {
+            const img = document.createElement('img');
+            img.src = url;
+            
+            // Random styling for each slide
+            const randomDirection = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+            const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+            
+            img.className = `slide-ultra ${randomDirection} ${randomShape}`;
+            
+            // Sparkle Particle Burst on entry (Center of screen approx)
+            setTimeout(() => {
+                if(window.confetti) {
+                    confetti({
+                        particleCount: 50,
+                        spread: 120,
+                        origin: { y: 0.5 },
+                        colors: ['#ffffff', '#ff99cc', '#ffd1dc'],
+                        disableForReducedMotion: true
+                    });
+                }
+            }, 800); // Trigger burst shortly after entry animation starts
+
+            slideshowContainer.appendChild(img);
+            
+            // Each fully animated slide takes about 4.5s of pacing before next starts overlapping
+            setTimeout(() => {
+                resolve();
+            }, 4000); 
+
+            // Clean up DOM later when animation finishes (CSS slideZoom is 8s)
+            setTimeout(() => {
+                img.remove();
+            }, 9000);
+        });
+    }
+
     initViewer();
 }
