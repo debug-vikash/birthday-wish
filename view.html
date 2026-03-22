@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Surprise for You</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="viewer-body">
+    <button id="music-btn" class="floating-btn">♪ Play Music</button>
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2023/06/15/audio_1cd7f2f9b6.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="loader" class="screen flex-center">
+        <div class="heart-pulse">❤️</div>
+        <p>Loading your surprise...</p>
+    </div>
+
+    <!-- Error Screen -->
+    <div id="error-screen" class="screen flex-center hidden">
+        <h2>Oops!</h2>
+        <p>We couldn't find this surprise. The link might be broken.</p>
+    </div>
+
+    <!-- Main Viewer Experience -->
+    <div id="experience" class="hidden screen">
+        <h1 class="glow-text">Happy Birthday, <br><span id="bday-name">Name</span>!</h1>
+        <p class="subtitle fade-in">Tap anywhere to start the full magic ✨</p>
+        <p class="subtitle fade-in" style="font-size: 0.9rem; margin-top: 5px;">(Or catch the floating hearts for a sneak peek!)</p>
+        
+        <!-- Hearts Container -->
+        <div id="hearts-container"></div>
+
+        <!-- Heart Click Photo Frame -->
+        <div id="photo-frame-popup" class="hidden">
+            <div class="heart-frame">
+                <img id="frame-image" src="" alt="Memory">
+            </div>
+            <button id="close-frame-btn" class="close-btn">×</button>
+        </div>
+    </div>
+
+    <!-- Full Screen Slideshow -->
+    <div id="slideshow-overlay" class="hidden">
+        <div id="slideshow-image-container"></div>
+    </div>
+
+    <!-- Confetti & Final Message -->
+    <div id="final-screen" class="hidden screen flex-center">
+        <h1 class="glow-text animate-pulse" style="z-index: 410;">You mean the world to me! ❤️</h1>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+</body>
+</html>

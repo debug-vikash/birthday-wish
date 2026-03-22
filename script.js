@@ -1,392 +1,324 @@
-/**
- * Birthday Wish - Emotional & Magical
- * ===================================
- * Pure Vanilla JavaScript - no libraries.
- * Flow: Name input → Wish screen → Hearts, photos, slideshow, surprise.
- */
+// ====== CONFIGURATION ======
+// IMPORTANT: Replace these with your actual Supabase URL and Anon Key
+const SUPABASE_URL = 'https://snjifhxhorgsqwgzfhml.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuamlmaHhob3Jnc3F3Z3pmaG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODAyNTYsImV4cCI6MjA4OTc1NjI1Nn0.wdxKWZAsYW0RYr_2ONr_oiSLX2P8QnYeOT3qaksUGtQ';
 
-// -------- Config --------
-const HEART_COUNT = 50;
-const CONFETTI_COUNT = 500;
-const SECONDS_PER_PHOTO = 5;  // Each photo shown for 5 sec; total time = numPhotos * 5
-const SHAPE_TYPES = ["heart", "circle", "rounded", "blob"];
-const SLIDE_DIRECTIONS = ["slide-ltr", "slide-rtl", "slide-ttb", "slide-btt", "slide-diag1", "slide-diag2"];
-
-// -------- DOM --------
-const nameScreen = document.getElementById("nameScreen");
-const wishScreen = document.getElementById("wishScreen");
-const nameInput = document.getElementById("nameInput");
-const createSurpriseBtn = document.getElementById("createSurpriseBtn");
-const introHearts = document.getElementById("introHearts");
-const birthdayName = document.getElementById("birthdayName");
-const heartsContainer = document.getElementById("heartsContainer");
-const tapHint = document.getElementById("tapHint");
-const uploadSection = document.getElementById("uploadSection");
-const photoInput = document.getElementById("photoInput");
-const photoGallery = document.getElementById("photoGallery");
-const photoPopup = document.getElementById("photoPopup");
-const popupPhotoImg = document.getElementById("popupPhotoImg");
-const closePopupBtn = document.getElementById("closePopupBtn");
-const slideshowOverlay = document.getElementById("slideshowOverlay");
-const slideshowContainer = document.getElementById("slideshowContainer");
-const surpriseBtn = document.getElementById("surpriseBtn");
-const shareBtn = document.getElementById("shareBtn");
-const shareModal = document.getElementById("shareModal");
-const shareModalText = document.getElementById("shareModalText");
-const shareLinkInput = document.getElementById("shareLinkInput");
-const finalMessage = document.getElementById("finalMessage");
-const finalMessageTitle = document.getElementById("finalMessageTitle");
-const finalMessageBody = document.getElementById("finalMessageBody");
-const customSurpriseTitle = document.getElementById("customSurpriseTitle");
-const customSurpriseBody = document.getElementById("customSurpriseBody");
-const bgMusic = document.getElementById("bgMusic");
-const musicToggleBtn = document.getElementById("musicToggleBtn");
-const musicIcon = document.querySelector(".music-icon");
-const confettiLayer = document.getElementById("confettiLayer");
-
-// -------- State --------
-let uploadedPhotos = [];
-let slideshowActive = false;
-let isMusicPlaying = false;
-
-/* ============================================
-   1. NAME INPUT → Create Surprise
-   ============================================ */
-
-function goToWishScreen(name, prefillTitle = "", prefillBody = "", skipTransition = false) {
-  birthdayName.textContent = name;
-  if (customSurpriseTitle) customSurpriseTitle.value = prefillTitle;
-  if (customSurpriseBody) customSurpriseBody.value = prefillBody;
-
-  if (skipTransition) {
-    nameScreen.classList.add("hidden");
-    wishScreen.classList.remove("hidden");
-    initHearts();
-    bgMusic.play().catch(() => {});
-    isMusicPlaying = true;
-    musicToggleBtn.classList.add("playing");
-    if (musicIcon) musicIcon.textContent = "❚❚";
-    return;
-  }
-
-  nameScreen.classList.add("fade-out");
-  setTimeout(() => {
-    nameScreen.classList.add("hidden");
-    wishScreen.classList.remove("hidden");
-    initHearts();
-    bgMusic.play().catch(() => {});
-    isMusicPlaying = true;
-    musicToggleBtn.classList.add("playing");
-    if (musicIcon) musicIcon.textContent = "❚❚";
-  }, 600);
+let supabase;
+if (typeof window.supabase !== 'undefined') {
+    // Initialize Supabase Client
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
-createSurpriseBtn.addEventListener("click", () => {
-  const name = nameInput.value.trim() || "Special Someone";
-  goToWishScreen(name);
-});
+// ====== CREATOR PAGE LOGIC ======
+const creatorForm = document.getElementById('creator-form');
+if (creatorForm) {
+    const photosInput = document.getElementById('photos');
+    const previewContainer = document.getElementById('preview-container');
+    const loadingDiv = document.getElementById('loading');
+    const submitBtn = document.getElementById('submit-btn');
+    const successPopup = document.getElementById('success-popup');
+    const shareLinkInput = document.getElementById('share-link');
+    const copyBtn = document.getElementById('copy-btn');
+    
+    // Preview Photos before Upload
+    photosInput.addEventListener('change', () => {
+        previewContainer.innerHTML = '';
+        const files = Array.from(photosInput.files).slice(0, 10); // max 10
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                previewContainer.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
 
-// Check for share link on load (?name=...&title=...&body=...)
-(function checkShareLink() {
-  const params = new URLSearchParams(window.location.search);
-  const name = params.get("name");
-  if (name) {
-    nameInput.value = decodeURIComponent(name);
-    goToWishScreen(
-      decodeURIComponent(name),
-      params.get("title") ? decodeURIComponent(params.get("title")) : "",
-      params.get("body") ? decodeURIComponent(params.get("body")) : "",
-      true  // skip transition - open directly on shared link
-    );
-  }
-})();
+    // Form Submit
+    creatorForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value.trim();
+        const files = Array.from(photosInput.files).slice(0, 10);
+        
+        if (files.length === 0) {
+            alert("Please upload at least one photo!");
+            return;
+        }
 
-// Intro screen: few subtle hearts
-function initIntroHearts() {
-  for (let i = 0; i < 8; i++) {
-    setTimeout(() => createHeartElement(introHearts, false), i * 400);
-  }
-}
-initIntroHearts();
+        if (!SUPABASE_URL) {
+            alert("Please update SUPABASE_URL and SUPABASE_ANON_KEY in script.js to continue.");
+            return;
+        }
 
-/* ============================================
-   2. FLOATING HEARTS (pulse, rotate, glow)
-   ============================================ */
+        // Show loading state
+        submitBtn.disabled = true;
+        loadingDiv.classList.remove('hidden');
 
-function createHeartElement(container, interactive = true) {
-  const heart = document.createElement("div");
-  heart.classList.add("heart", "heart-floating");
+        try {
+            const photoUrls = [];
+            const timestamp = Date.now();
+            
+            // Upload each image to Supabase Storage 'birthday-photos' bucket
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${timestamp}_${i}.${fileExt}`;
+                
+                // Note: bucket 'birthday-photos' must exist and be public
+                const { data, error } = await supabase.storage
+                    .from('birthday-photos')
+                    .upload(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`, file, { cacheControl: '3600', upsert: false });
+                
+                if (error) {
+                    console.error("Upload error:", error);
+                    throw new Error("Failed to upload image. Does the bucket 'birthday-photos' exist?");
+                }
+                
+                // Get the public URL for the uploaded file
+                const { data: publicUrlData } = supabase.storage
+                    .from('birthday-photos')
+                    .getPublicUrl(`${name.replace(/[^a-zA-Z0-9]/g, '_')}/${fileName}`);
+                    
+                photoUrls.push(publicUrlData.publicUrl);
+            }
 
-  // Random size
-  const scale = 0.5 + Math.random() * 1.3;
-  heart.style.setProperty("--heart-scale", scale);
-  heart.style.left = `${Math.random() * 100}vw`;
-  heart.style.animationDuration = `${10 + Math.random() * 14}s`;
-  heart.style.animationDelay = `${Math.random() * 6}s`;
+            // Save the surprise details in Supabase Database 'surprises' table
+            const { data: dbData, error: dbError } = await supabase
+                .from('surprises')
+                .insert([{ name: name, photo_urls: photoUrls }])
+                .select();
+                
+            if (dbError) {
+                console.error("Database insert error:", dbError);
+                throw new Error("Failed to save data. Does the table 'surprises' exist?");
+            }
+            
+            const surpriseId = dbData[0].id;
+            
+            // Output link
+            const link = `${window.location.origin}/view.html?id=${surpriseId}`;
+            shareLinkInput.value = link;
+            
+            loadingDiv.classList.add('hidden');
+            successPopup.classList.remove('hidden');
+            
+        } catch (error) {
+            console.error(error);
+            alert("Error: " + error.message);
+            submitBtn.disabled = false;
+            loadingDiv.classList.add('hidden');
+        }
+    });
 
-  // Some hearts pulse and glow
-  if (Math.random() > 0.6) heart.classList.add("heart-pulse");
-  if (Math.random() > 0.7) heart.classList.add("heart-glow");
-
-  heart.addEventListener("animationend", () => {
-    heart.remove();
-    if (container === heartsContainer) createHeartElement(container, interactive);
-  });
-
-  if (interactive) {
-    const onHeartClick = (e) => {
-      e.stopPropagation();
-      heart.classList.remove("heart-floating", "heart-pulse");
-      heart.classList.add("heart-pop");
-      heart.addEventListener("animationend", () => {
-        heart.remove();
-        createHeartElement(container, true);
-      }, { once: true });
-
-      if (uploadedPhotos.length > 0) {
-        const idx = Math.floor(Math.random() * uploadedPhotos.length);
-        popupPhotoImg.src = uploadedPhotos[idx];
-        openPhotoPopup();
-      }
-    };
-    heart.addEventListener("click", onHeartClick);
-    heart.addEventListener("touchstart", onHeartClick, { passive: true });
-  }
-
-  container.appendChild(heart);
-}
-
-function initHearts() {
-  for (let i = 0; i < HEART_COUNT; i++) {
-    setTimeout(() => createHeartElement(heartsContainer, true), i * 150);
-  }
-}
-
-/* ============================================
-   3. PHOTO UPLOAD
-   ============================================ */
-
-photoInput.addEventListener("change", (e) => {
-  const files = e.target.files;
-  if (!files || files.length === 0) return;
-
-  uploadedPhotos = [];
-  let loaded = 0;
-
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    if (!file.type.startsWith("image/")) continue;
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      uploadedPhotos.push(ev.target.result);
-      loaded++;
-      if (loaded === Array.from(files).filter(f => f.type.startsWith("image/")).length) {
-        uploadSection.classList.add("fade-out");
-        setTimeout(() => {
-          uploadSection.style.display = "none";
-          renderPhotoGallery();
-          photoGallery.classList.remove("hidden");
-          tapHint.classList.remove("hidden");
-        }, 500);
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-function renderPhotoGallery() {
-  photoGallery.innerHTML = "";
-  uploadedPhotos.forEach((src, i) => {
-    const shape = SHAPE_TYPES[i % SHAPE_TYPES.length];
-    const item = document.createElement("div");
-    item.className = `photo-frame-item frame-${shape}`;
-    item.innerHTML = `<img src="${src}" alt="Memory ${i + 1}" />`;
-    photoGallery.appendChild(item);
-  });
+    // Copy to clipboard
+    copyBtn.addEventListener('click', () => {
+        shareLinkInput.select();
+        document.execCommand('copy');
+        copyBtn.textContent = 'Copied! ✨';
+        setTimeout(() => copyBtn.textContent = 'Copy Link', 2000);
+    });
 }
 
-/* ============================================
-   4. HEART POPUP
-   ============================================ */
+// ====== VIEWER PAGE LOGIC ======
+const viewerScreen = document.getElementById('experience');
+if (viewerScreen) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const surpriseId = urlParams.get('id');
+    const loader = document.getElementById('loader');
+    const errorScreen = document.getElementById('error-screen');
+    
+    let surpriseData = null;
+    let musicPlaying = false;
+    const bgMusic = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-btn');
 
-function openPhotoPopup() {
-  photoPopup.classList.remove("hidden");
-}
+    // Music toggle
+    musicBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Stop click from bubbling up to the slideshow trigger
+        if (musicPlaying) {
+            bgMusic.pause();
+            musicBtn.innerHTML = '♪ Play Music';
+        } else {
+            bgMusic.play().catch(err => console.log("Audio play blocked:", err));
+            musicBtn.innerHTML = '❚❚ Pause Music';
+        }
+        musicPlaying = !musicPlaying;
+    });
 
-function closePhotoPopup() {
-  photoPopup.classList.add("hidden");
-}
+    async function initViewer() {
+        if (!surpriseId) {
+            loader.classList.add('hidden');
+            errorScreen.classList.remove('hidden');
+            return;
+        }
 
-closePopupBtn.addEventListener("click", closePhotoPopup);
-photoPopup.addEventListener("click", (e) => {
-  if (e.target === photoPopup) closePhotoPopup();
-});
+        try {
+            // Fetch surprise from DB
+            const { data, error } = await supabase
+                .from('surprises')
+                .select('*')
+                .eq('id', surpriseId)
+                .single();
 
-/* ============================================
-   5. TAP ANYWHERE → 10 sec slideshow
-   ============================================ */
-
-function maybeStartSlideshow(e) {
-  if (uploadedPhotos.length === 0) return;
-  if (!photoPopup.classList.contains("hidden")) return;
-  if (!finalMessage.classList.contains("hidden")) return;
-  if (e.target.closest(".music-btn")) return;
-  if (e.target.closest(".surprise-btn")) return;
-  if (e.target.closest(".share-btn")) return;
-
-  if (slideshowOverlay.classList.contains("hidden")) {
-    slideshowOverlay.classList.remove("hidden");
-    if (tapHint) tapHint.classList.add("hidden");
-    startSlideshow();
-  }
-}
-
-document.addEventListener("click", maybeStartSlideshow);
-document.addEventListener("touchstart", maybeStartSlideshow, { passive: true });
-
-function startSlideshow() {
-  if (uploadedPhotos.length === 0 || slideshowActive) return;
-
-  slideshowActive = true;
-  // Total time = number of photos * seconds per photo
-  const intervalMs = SECONDS_PER_PHOTO * 1000;
-  let index = 0;
-
-  function showNext() {
-    if (index >= uploadedPhotos.length) {
-      slideshowActive = false;
-      slideshowContainer.innerHTML = "";
-      slideshowOverlay.classList.add("hidden");
-      tapHint.classList.remove("hidden");
-      return;
+            if (error || !data) throw error || new Error("Surprise not found");
+            
+            surpriseData = data;
+            document.getElementById('bday-name').textContent = data.name;
+            
+            loader.classList.add('hidden');
+            viewerScreen.classList.remove('hidden');
+            
+            startFloatingHearts();
+            
+        } catch (error) {
+            console.error(error);
+            loader.classList.add('hidden');
+            errorScreen.classList.remove('hidden');
+        }
     }
 
-    slideshowContainer.innerHTML = "";
-    const slide = document.createElement("div");
-    slide.className = `slideshow-item ${SLIDE_DIRECTIONS[Math.floor(Math.random() * SLIDE_DIRECTIONS.length)]}`;
-    slide.innerHTML = `<img src="${uploadedPhotos[index]}" alt="Slide ${index + 1}" />`;
-    slideshowContainer.appendChild(slide);
+    // 1. Floating Hearts
+    function startFloatingHearts() {
+        const container = document.getElementById('hearts-container');
+        const heartIcons = ['❤️', '💖', '💝', '💕', '💗', '💓', '✨'];
+        
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.classList.add('floating-heart');
+            heart.textContent = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+            heart.style.left = `${Math.random() * 90}vw`;
+            heart.style.animationDuration = `${6 + Math.random() * 6}s`;
+            
+            const scale = 0.6 + Math.random() * 0.8;
+            heart.style.transform = `scale(${scale})`;
+            
+            container.appendChild(heart);
+            
+            // Interaction: clicking a heart shows a random photo
+            heart.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showRandomPhoto();
+                heart.style.animationPlayState = 'paused';
+                heart.style.opacity = '0';
+                setTimeout(() => heart.remove(), 300);
+            });
 
-    index++;
-    setTimeout(showNext, intervalMs);
-  }
-
-  showNext();
-}
-
-/* ============================================
-   6. BIG SURPRISE → Confetti + You Are Special
-   ============================================ */
-
-surpriseBtn.addEventListener("click", () => {
-  // Confetti blast
-  for (let i = 0; i < CONFETTI_COUNT; i++) {
-    setTimeout(() => createConfettiPiece(), i * 12);
-  }
-
-  // Build final message from user's custom text
-  const defaultTitle = "You Are Special ❤️";
-  const title = (customSurpriseTitle?.value || "").trim() || defaultTitle;
-  const body = (customSurpriseBody?.value || "").trim();
-
-  finalMessageTitle.textContent = title;
-  if (body) {
-    finalMessageBody.textContent = body;
-    finalMessageBody.classList.remove("hidden");
-  } else {
-    finalMessageBody.textContent = "";
-    finalMessageBody.classList.add("hidden");
-  }
-
-  // Show final message
-  finalMessage.classList.remove("hidden");
-
-  // Hearts speed up
-  heartsContainer.classList.add("hearts-fast");
-
-  // Hide message after a while (optional - stays visible)
-  setTimeout(() => {
-    finalMessage.classList.add("hidden");
-    heartsContainer.classList.remove("hearts-fast");
-  }, 6000);
-});
-
-function createConfettiPiece() {
-  const piece = document.createElement("div");
-  piece.classList.add("confetti-piece");
-  piece.style.left = `${Math.random() * 100}vw`;
-  const colors = ["#ffe259", "#ff6a88", "#a18cd1", "#fbc2eb", "#ff9a9e", "#fff"];
-  piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-  piece.style.animationDuration = `${3 + Math.random() * 4}s`;
-  piece.style.animationDelay = `${Math.random() * 1.5}s`;
-  piece.addEventListener("animationend", () => piece.remove());
-  confettiLayer.appendChild(piece);
-}
-
-/* ============================================
-   7. SHARE - Create real shareable link
-   ============================================ */
-
-function buildShareUrl() {
-  const base = window.location.origin + window.location.pathname;
-  const params = new URLSearchParams();
-  const name = birthdayName?.textContent?.trim() || nameInput?.value?.trim() || "Special Someone";
-  params.set("name", name);
-  const title = (customSurpriseTitle?.value || "").trim();
-  const body = (customSurpriseBody?.value || "").trim();
-  if (title) params.set("title", title);
-  if (body) params.set("body", body);
-  const qs = params.toString();
-  return qs ? `${base}?${qs}` : base;
-}
-
-shareBtn.addEventListener("click", async () => {
-  const url = buildShareUrl();
-
-  try {
-    await navigator.clipboard.writeText(url);
-    shareModalText.textContent = "Link Copied Successfully!";
-    shareLinkInput?.classList.add("hidden");
-  } catch {
-    shareModalText.textContent = "Copy this link to share:";
-    if (shareLinkInput) {
-      shareLinkInput.value = url;
-      shareLinkInput.classList.remove("hidden");
-      shareLinkInput.select();
+            // Cleanup
+            setTimeout(() => {
+                if (container.contains(heart)) heart.remove();
+            }, 12000); 
+        }, 600);
     }
-  }
 
-  shareModal.classList.remove("hidden");
-  setTimeout(() => {
-    shareModal.classList.add("hidden");
-    shareLinkInput?.classList.add("hidden");
-  }, 4000);
-});
+    // 2. Photo Popup Frame
+    const photoFramePopup = document.getElementById('photo-frame-popup');
+    const frameImage = document.getElementById('frame-image');
+    const closeFrameBtn = document.getElementById('close-frame-btn');
 
-// Close modal on background click
-shareModal.addEventListener("click", (e) => {
-  if (e.target === shareModal) {
-    shareModal.classList.add("hidden");
-    shareLinkInput?.classList.add("hidden");
-  }
-});
+    function showRandomPhoto() {
+        if (!surpriseData || surpriseData.photo_urls.length === 0) return;
+        const urls = surpriseData.photo_urls;
+        const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+        frameImage.src = randomUrl;
+        photoFramePopup.classList.remove('hidden');
+    }
 
-/* ============================================
-   8. MUSIC
-   ============================================ */
+    closeFrameBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        photoFramePopup.classList.add('hidden');
+    });
 
-function toggleMusic() {
-  if (isMusicPlaying) {
-    bgMusic.pause();
-    musicToggleBtn.classList.remove("playing");
-    if (musicIcon) musicIcon.textContent = "▶";
-  } else {
-    bgMusic.play().catch(() => {});
-    musicToggleBtn.classList.add("playing");
-    if (musicIcon) musicIcon.textContent = "❚❚";
-  }
-  isMusicPlaying = !isMusicPlaying;
+    // 3. Full Screen Slideshow
+    let slideshowStarted = false;
+    document.addEventListener('click', (e) => {
+        // Start slideshow if clicking anywhere EXCEPT on music btn, hearts, or close button
+        if (!viewerScreen.classList.contains('hidden') 
+            && !slideshowStarted 
+            && e.target.id !== 'music-btn' 
+            && !e.target.classList.contains('floating-heart')
+            && !e.target.closest('#photo-frame-popup')) {
+            startSlideshow();
+        }
+    });
+
+    function startSlideshow() {
+        if (!surpriseData || surpriseData.photo_urls.length === 0 || slideshowStarted) return;
+        slideshowStarted = true;
+        
+        photoFramePopup.classList.add('hidden'); 
+        const overlay = document.getElementById('slideshow-overlay');
+        const container = document.getElementById('slideshow-image-container');
+        overlay.classList.remove('hidden');
+
+        // Optional: autoplay music on tap if not already playing
+        if (!musicPlaying) {
+            bgMusic.play().catch(() => {});
+            musicPlaying = true;
+            musicBtn.innerHTML = '❚❚ Pause Music';
+        }
+
+        const urls = surpriseData.photo_urls;
+        let index = 0;
+
+        function showNextSlide() {
+            if (index >= urls.length) {
+                // End of slideshow
+                overlay.classList.add('hidden');
+                showConfettiAndFinalMessage();
+                return;
+            }
+
+            container.innerHTML = ''; // clear previous
+            const img = document.createElement('img');
+            img.src = urls[index];
+            img.className = 'slide-item';
+            container.appendChild(img);
+
+            // Small delay to trigger CSS transition
+            setTimeout(() => {
+                img.classList.add('active');
+            }, 50);
+
+            index++;
+            setTimeout(showNextSlide, 3500); // 3.5 seconds per slide
+        }
+
+        showNextSlide();
+    }
+
+    // 4. Confetti and Glow Final Message
+    function showConfettiAndFinalMessage() {
+        const finalScreen = document.getElementById('final-screen');
+        finalScreen.classList.remove('hidden');
+
+        // Confetti burst from both sides
+        const duration = 4000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            // Check if user is still on page
+            if (Date.now() < end) {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff4d6d', '#ff758f', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff4d6d', '#ff758f', '#ffffff']
+                });
+                requestAnimationFrame(frame);
+            }
+        }());
+    }
+
+    // Initialize Viewer
+    initViewer();
 }
-
-musicToggleBtn.addEventListener("click", toggleMusic);
