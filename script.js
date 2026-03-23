@@ -76,6 +76,7 @@ if (creatorForm) {
     const hiddenAudioPlayer = document.getElementById('hidden-audio-player');
 
     let audioDuration = 0;
+    let trimRafPending = false;
 
     function formatTime(seconds) {
         const m = Math.floor(seconds / 60);
@@ -91,17 +92,24 @@ if (creatorForm) {
             trimEnd.value = Number(trimStart.value) + 0.5;
         }
 
-        const startPct = (trimStart.value / audioDuration) * 100;
-        const endPct = (trimEnd.value / audioDuration) * 100;
+        if (trimRafPending) return;
+        trimRafPending = true;
 
-        thumbStart.style.left = `${startPct}%`;
-        thumbEnd.style.left = `${endPct}%`;
-        trimRangeHighlight.style.left = `${startPct}%`;
-        trimRangeHighlight.style.width = `${endPct - startPct}%`;
+        requestAnimationFrame(() => {
+            const startPct = (trimStart.value / audioDuration) * 100;
+            const endPct = (trimEnd.value / audioDuration) * 100;
 
-        trimStartDisplay.innerText = formatTime(trimStart.value);
-        trimEndDisplay.innerText = formatTime(trimEnd.value);
-        trimDurationDisplay.innerText = `Total: ${Math.floor(trimEnd.value - trimStart.value)}s`;
+            thumbStart.style.left = `${startPct}%`;
+            thumbEnd.style.left = `${endPct}%`;
+            trimRangeHighlight.style.left = `${startPct}%`;
+            trimRangeHighlight.style.width = `${endPct - startPct}%`;
+
+            trimStartDisplay.innerText = formatTime(trimStart.value);
+            trimEndDisplay.innerText = formatTime(trimEnd.value);
+            trimDurationDisplay.innerText = `Total: ${Math.floor(trimEnd.value - trimStart.value)}s`;
+            
+            trimRafPending = false;
+        });
     }
 
     if (trimStart) trimStart.addEventListener('input', updateTrimUI);
@@ -133,13 +141,21 @@ if (creatorForm) {
         musicInput.addEventListener('change', (e) => {
             if(e.target.files.length > 0) {
                 const file = e.target.files[0];
-                musicFilenameDisplay.innerText = file.name;
-                musicFilenameDisplay.classList.add('text-primary');
+                musicFilenameDisplay.innerText = "Processing audio track...";
+                musicFilenameDisplay.classList.add('animate-pulse', 'text-primary');
                 
                 // Load audio to get duration
+                if (window.currentAudioUrl) URL.revokeObjectURL(window.currentAudioUrl);
                 const objectUrl = URL.createObjectURL(file);
+                window.currentAudioUrl = objectUrl;
+                
                 hiddenAudioPlayer.src = objectUrl;
+                hiddenAudioPlayer.load(); // explicitly kick off load for mobile
+                
                 hiddenAudioPlayer.onloadedmetadata = () => {
+                    musicFilenameDisplay.innerText = file.name;
+                    musicFilenameDisplay.classList.remove('animate-pulse');
+                    
                     audioDuration = hiddenAudioPlayer.duration;
                     trimStart.max = audioDuration;
                     trimEnd.max = audioDuration;
@@ -149,9 +165,15 @@ if (creatorForm) {
                     
                     if (musicTrimContainer) musicTrimContainer.classList.remove('hidden');
                 };
+                
+                hiddenAudioPlayer.onerror = () => {
+                     // Fallback if metadata blocks
+                     musicFilenameDisplay.innerText = file.name + " (Ready)";
+                     musicFilenameDisplay.classList.remove('animate-pulse');
+                };
             } else {
                 musicFilenameDisplay.innerText = "Tap to select an audio file";
-                musicFilenameDisplay.classList.remove('text-primary');
+                musicFilenameDisplay.classList.remove('text-primary', 'animate-pulse');
                 if (musicTrimContainer) musicTrimContainer.classList.add('hidden');
                 hiddenAudioPlayer.pause();
                 hiddenAudioPlayer.src = "";
