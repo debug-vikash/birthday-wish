@@ -46,6 +46,7 @@ if (creatorForm) {
     const copyBtn = document.getElementById('copy-btn');
     const musicInput = document.getElementById('music');
     const musicFilenameDisplay = document.getElementById('music-filename');
+    const createAnotherBtn = document.getElementById('create-another-btn');
 
     // Toggle Custom Occasion Input
     if (occasionSelect) {
@@ -169,7 +170,7 @@ if (creatorForm) {
         el.style.top = `${Math.random() * 90}vh`;
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 4000);
-    }, 2500);
+    }, 4000); // Throttled from 2.5s to 4s to reduce memory garbage collection
 
     // Preview Photos before Upload
     let uploadedFiles = [];
@@ -242,6 +243,7 @@ if (creatorForm) {
     let dragStart = { x: 0, y: 0 };
     let frameSize = { w: 250, h: 250 };
     let imageNaturalSize = { w: 0, h: 0 };
+    let rafPending = false;
 
     function closeCrop() {
         cropModal.classList.add('opacity-0');
@@ -287,7 +289,8 @@ if (creatorForm) {
     }
 
     function updateImageTransform() {
-        cropImage.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
+        cropImage.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`;
+        cropImage.style.willChange = 'transform';
     }
 
     if (cropRatio) {
@@ -330,7 +333,14 @@ if (creatorForm) {
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             transform.x = clientX - dragStart.x;
             transform.y = clientY - dragStart.y;
-            updateImageTransform();
+            
+            if(!rafPending) {
+                rafPending = true;
+                requestAnimationFrame(() => {
+                    updateImageTransform();
+                    rafPending = false;
+                });
+            }
         };
         const endDrag = () => { isDragging = false; };
         
@@ -494,9 +504,9 @@ if (creatorForm) {
             const originalText = copyBtn.innerText;
             copyBtn.innerText = "Copied! ✨";
             copyBtn.classList.add('bg-green-500');
-            // Trigger Confetti
+            // Trigger Confetti gentle
             if (window.confetti) {
-                confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#ff99cc', '#913e6c', '#ffffff'] });
+                confetti({ particleCount: 60, spread: 80, origin: { y: 0.6 }, colors: ['#ff99cc', '#913e6c', '#ffffff'] });
             }
             setTimeout(() => {
                 copyBtn.innerText = originalText;
@@ -504,6 +514,27 @@ if (creatorForm) {
             }, 2000);
         });
     });
+
+    if (createAnotherBtn) {
+        createAnotherBtn.addEventListener('click', () => {
+            creatorForm.reset();
+            if (photoGallery) photoGallery.innerHTML = '';
+            
+            if (musicFilenameDisplay) {
+                musicFilenameDisplay.innerText = "Tap to select an audio file";
+                musicFilenameDisplay.classList.remove('text-primary');
+            }
+            if (musicTrimContainer) musicTrimContainer.classList.add('hidden');
+            
+            if (customOccasionContainer) customOccasionContainer.classList.add('hidden');
+            if (customOccasionInput) customOccasionInput.required = false;
+            
+            uploadedFiles = [];
+            successPopup.classList.add('hidden');
+            creatorForm.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 }
 
 // ====== VIEWER PAGE LOGIC ======
@@ -687,7 +718,7 @@ if (viewerBody) {
                 const y = (rect.top + rect.height / 2) / window.innerHeight;
                 if(window.confetti) {
                     confetti({
-                        particleCount: 200,
+                        particleCount: 50,
                         spread: 60,
                         origin: { x, y },
                         colors: ['#ff99cc', '#ffffff', '#ffafbd'],
@@ -704,7 +735,7 @@ if (viewerBody) {
             
             heartsContainer.appendChild(heart);
             setTimeout(() => { heart.remove(); }, duration * 1000);
-        }, 1200);   // Spawn a heart every 1.2s
+        }, 2000);   // Throttle spawn a heart every 2s instead of 1.2s
     }
 
     closeFrameBtn.addEventListener('click', () => {
@@ -756,23 +787,19 @@ if (viewerBody) {
             // Subtle sparkle around text
             setTimeout(() => {
                 if(window.confetti) {
-                    confetti({ particleCount: 95, spread: 80, origin: { y: 0.7 }, colors: ['#ffffff', '#ff99cc'], disableForReducedMotion: true });
+                    confetti({ particleCount: 50, spread: 80, origin: { y: 0.7 }, colors: ['#ffffff', '#ff99cc'], disableForReducedMotion: true });
                 }
             }, 1000);
         }
         
         if (window.confetti) {
-            const duration = 5 * 1000;
-            const end = Date.now() + duration;
-            (function frame() {
-                confetti({
-                    particleCount: 50, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff99cc', '#ffffff']
-                });
-                confetti({
-                    particleCount: 50, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff99cc', '#ffffff']
-                });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
+            let bursts = 0;
+            const endConfettiInterval = setInterval(() => {
+                confetti({ particleCount: 25, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff99cc', '#ffffff'] });
+                confetti({ particleCount: 25, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff99cc', '#ffffff'] });
+                bursts++;
+                if(bursts > 10) clearInterval(endConfettiInterval);
+            }, 300); // Trigger bursts cleanly without overloading frame renderer
         }
     }
 
@@ -785,14 +812,15 @@ if (viewerBody) {
             const randomDirection = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
             const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
             
-            img.className = `slide-ultra float-rotate-anim ${randomDirection} ${randomShape}`;
+            // Removed float-rotate-anim because it overwrites the slideIn opacity keyframes, causing invisible slides
+            img.className = `slide-ultra ${randomDirection} ${randomShape}`;
             
             // Sparkle Particle Burst on entry (Center of screen approx)
             setTimeout(() => {
                 if(window.confetti) {
                     confetti({
-                        particleCount: 200,
-                        spread: 120,
+                        particleCount: 30, // Strongly reduced to avoid slide loading stutters
+                        spread: 80,
                         origin: { y: 0.5 },
                         colors: ['#ffffff', '#ff99cc', '#ffd1dc'],
                         disableForReducedMotion: true
