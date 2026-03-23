@@ -217,55 +217,7 @@
         </div>
     </main>
 
-    <!-- Crop Modal Editor -->
-    <div id="crop-modal" class="hidden fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity">
-        <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col scale-95 opacity-0 transition-transform duration-300" id="crop-modal-content">
-            <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2"><span class="material-symbols-outlined text-primary">crop</span> Crop Photo</h3>
-                <button type="button" id="close-crop-btn" class="text-gray-500 hover:text-red-500 material-symbols-outlined transition-colors bg-gray-200 rounded-full p-1">close</button>
-            </div>
-            
-            <!-- Crop Area -->
-            <div class="relative w-full h-[50vh] sm:h-[60vh] bg-black overflow-hidden flex items-center justify-center touch-none" id="crop-container">
-                <div id="crop-frame" class="relative overflow-hidden border border-white transition-all duration-300 flex items-center justify-center mask-container" style="width: 250px; height: 250px; background-color: #1a1a1a;">
-                    <img id="crop-image" src="" class="absolute max-w-none origin-center touch-none cursor-move" style="transform: translate3d(0px, 0px, 0px) scale(1); will-change: transform; opacity: 0.9;">
-                </div>
-            </div>
-            
-            <!-- Controls -->
-            <div class="p-4 sm:p-5 space-y-4 bg-gray-50">
-                <div class="flex items-center gap-3">
-                    <span class="material-symbols-outlined text-sm text-gray-500">zoom_out</span>
-                    <input type="range" id="crop-zoom" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer" min="0.1" max="5" step="0.01" value="1">
-                    <span class="material-symbols-outlined text-sm text-gray-500">zoom_in</span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <span class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase block mb-1">Aspect Ratio</span>
-                        <select id="crop-ratio" class="w-full text-sm bg-white border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-primary shadow-sm font-medium text-gray-700">
-                            <option value="1">Square (1:1)</option>
-                            <option value="0.8">Vertical (4:5)</option>
-                            <option value="1.5">Horizontal (3:2)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <span class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase block mb-1">Shape Preview</span>
-                        <select id="crop-shape" class="w-full text-sm bg-white border border-gray-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-primary shadow-sm font-medium text-gray-700">
-                            <option value="none">None</option>
-                            <option value="shape-blob">Organic Blob</option>
-                            <option value="shape-broken-heart">Heart Frame</option>
-                            <option value="shape-circle">Classic Circle</option>
-                        </select>
-                    </div>
-                </div>
 
-                <button type="button" id="apply-crop-btn" class="w-full jelly-btn bg-gradient-to-r from-primary to-primary-fixed text-white py-3 sm:py-4 rounded-xl font-bold shadow-lg shadow-pink-200 mt-2 flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">auto_fix_high</span> Apply Magic Crop
-                </button>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js" defer></script>

@@ -199,27 +199,7 @@ if (creatorForm) {
     const photoGallery = document.getElementById('photo-gallery');
     let objectUrls = [];
 
-    window.openCropModal = function(index) {
-        currentCropIndex = index;
-        const file = uploadedFiles[index];
-        cropImage.src = URL.createObjectURL(file);
-        
-        cropImage.onload = () => {
-            imageNaturalSize = { w: cropImage.naturalWidth, h: cropImage.naturalHeight };
-            transform = { x: 0, y: 0, scale: 1 };
-            if (cropZoom) cropZoom.value = 1;
-            
-            updateFrameSize();
-            fitImageToFrame();
-            updateImageTransform();
-            
-            cropModal.classList.remove('hidden');
-            setTimeout(() => {
-                cropModal.classList.remove('opacity-0');
-                cropModalContent.classList.remove('scale-95', 'opacity-0');
-            }, 10);
-        };
-    };
+
 
     function renderGallery() {
         if(!photoGallery) return;
@@ -250,12 +230,7 @@ if (creatorForm) {
             const div = document.createElement('div');
             div.className = 'relative group aspect-square rounded-xl overflow-hidden shadow-sm border border-gray-200 opacity-0 transition-opacity duration-500';
             div.innerHTML = `
-                <img src="${url}" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer" onclick="openCropModal(${i})">
-                    <button type="button" class="bg-white text-primary p-2 rounded-full hover:scale-110 transition-transform shadow-lg flex items-center">
-                        <span class="material-symbols-outlined pointer-events-none tracking-normal">crop</span>
-                    </button>
-                </div>
+                <img src="${url}" class="w-full h-full object-cover shadow-inner">
             `;
             
             if (photoGallery.contains(loaderDiv)) {
@@ -278,179 +253,65 @@ if (creatorForm) {
         renderNext();
     }
 
-    photosInput.addEventListener('change', () => {
+    // Image Compressor Function for mobile performance
+    function compressImageFile(file, maxWidth = 1080) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = Math.max(width, height);
+                    if (maxDim > maxWidth) {
+                        const scale = maxWidth / maxDim;
+                        width = Math.floor(width * scale);
+                        height = Math.floor(height * scale);
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob(blob => {
+                        if(blob) {
+                            resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                        } else {
+                            resolve(file); // fallback
+                        }
+                    }, 'image/jpeg', 0.85); // Compress quality to 85%
+                };
+                img.onerror = () => resolve(file); // fallback
+            };
+            reader.onerror = () => resolve(file); // fallback
+        });
+    }
+
+    photosInput.addEventListener('change', async (e) => {
         if(photoGallery) photoGallery.innerHTML = '';
         if(previewContainer) previewContainer.innerHTML = ''; 
         
-        uploadedFiles = Array.from(photosInput.files).slice(0, 10);
-        renderGallery();
-    });
+        const filesToProcess = Array.from(photosInput.files).slice(0, 10);
+        if (filesToProcess.length === 0) return;
 
-    // Photo Crop Modal Logic
-    const cropModal = document.getElementById('crop-modal');
-    const cropModalContent = document.getElementById('crop-modal-content');
-    const closeCropBtn = document.getElementById('close-crop-btn');
-    const applyCropBtn = document.getElementById('apply-crop-btn');
-    const cropImage = document.getElementById('crop-image');
-    const cropFrame = document.getElementById('crop-frame');
-    const cropContainer = document.getElementById('crop-container');
-    const cropZoom = document.getElementById('crop-zoom');
-    const cropRatio = document.getElementById('crop-ratio');
-    const cropShapeSelect = document.getElementById('crop-shape');
-    
-    let currentCropIndex = -1;
-    let transform = { x: 0, y: 0, scale: 1 };
-    let isDragging = false;
-    let dragStart = { x: 0, y: 0 };
-    let frameSize = { w: 250, h: 250 };
-    let imageNaturalSize = { w: 0, h: 0 };
-    let rafPending = false;
+        // Show generic processing state
+        const loaderDiv = document.createElement('div');
+        loaderDiv.className = 'col-span-full text-center text-sm font-bold text-primary animate-pulse py-4 bg-pink-50 rounded-xl';
+        loaderDiv.innerText = 'Optimizing and compressing photos...';
+        photoGallery.appendChild(loaderDiv);
 
-    function closeCrop() {
-        cropModal.classList.add('opacity-0');
-        cropModalContent.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => {
-            cropModal.classList.add('hidden');
-            cropImage.src = '';
-        }, 300);
-    }
-    
-    if(closeCropBtn) closeCropBtn.addEventListener('click', closeCrop);
-
-    function updateFrameSize() {
-        const ratio = parseFloat(cropRatio.value);
-        let baseW = 250;
-        let baseH = 250;
-        
-        if (ratio < 1) { // vertical
-            baseW = 250 * ratio;
-        } else if (ratio > 1) { // horizontal
-            baseH = 250 / ratio;
+        uploadedFiles = [];
+        // Compress sequentially to save RAM on budget phones
+        for (let i = 0; i < filesToProcess.length; i++) {
+            const compressedFile = await compressImageFile(filesToProcess[i], 1080);
+            uploadedFiles.push(compressedFile);
         }
         
-        frameSize = { w: baseW, h: baseH };
-        cropFrame.style.width = `${baseW}px`;
-        cropFrame.style.height = `${baseH}px`;
-    }
-
-    function fitImageToFrame() {
-        const scaleX = frameSize.w / imageNaturalSize.w;
-        const scaleY = frameSize.h / imageNaturalSize.h;
-        const minScale = Math.max(scaleX, scaleY);
-        
-        transform.scale = minScale;
-        cropImage.style.width = `${imageNaturalSize.w}px`;
-        cropImage.style.height = `${imageNaturalSize.h}px`;
-        transform.x = 0;
-        transform.y = 0;
-        
-        cropZoom.min = minScale;
-        cropZoom.max = Math.max(minScale * 5, 2);
-        cropZoom.value = minScale;
-    }
-
-    function updateImageTransform() {
-        cropImage.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`;
-        cropImage.style.willChange = 'transform';
-    }
-
-    if (cropRatio) {
-        cropRatio.addEventListener('change', () => {
-            updateFrameSize();
-            fitImageToFrame();
-            updateImageTransform();
-        });
-    }
-
-    if (cropShapeSelect) {
-        cropShapeSelect.addEventListener('change', () => {
-             const val = cropShapeSelect.value;
-             cropFrame.style.borderRadius = '0';
-             cropFrame.style.clipPath = 'none';
-             cropFrame.classList.remove('shape-blob');
-             
-             if (val === 'shape-blob') {
-                 cropFrame.classList.add('shape-blob');
-             } else if (val === 'shape-circle') {
-                 cropFrame.style.borderRadius = '50%';
-             } else if (val === 'shape-broken-heart') {
-                 cropFrame.style.clipPath = 'polygon(50% 20%, 80% 0, 100% 30%, 50% 100%, 0 30%, 20% 0)';
-             }
-        });
-    }
-
-    if (cropContainer) {
-        const startDrag = (e) => {
-            isDragging = true;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            dragStart = { x: clientX - transform.x, y: clientY - transform.y };
-            if(!e.touches) e.preventDefault();
-        };
-        const doDrag = (e) => {
-            if (!isDragging) return;
-            e.preventDefault(); 
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            transform.x = clientX - dragStart.x;
-            transform.y = clientY - dragStart.y;
-            
-            if(!rafPending) {
-                rafPending = true;
-                requestAnimationFrame(() => {
-                    updateImageTransform();
-                    rafPending = false;
-                });
-            }
-        };
-        const endDrag = () => { isDragging = false; };
-        
-        cropContainer.addEventListener('mousedown', startDrag);
-        window.addEventListener('mousemove', doDrag);
-        window.addEventListener('mouseup', endDrag);
-        
-        cropContainer.addEventListener('touchstart', startDrag, {passive: false});
-        window.addEventListener('touchmove', doDrag, {passive: false});
-        window.addEventListener('touchend', endDrag);
-    }
-
-    if (cropZoom) {
-        cropZoom.addEventListener('input', () => {
-            transform.scale = parseFloat(cropZoom.value);
-            updateImageTransform();
-        });
-    }
-
-    if (applyCropBtn) {
-        applyCropBtn.addEventListener('click', () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const exportScale = 2; // high-res edge tracing
-            canvas.width = frameSize.w * exportScale;
-            canvas.height = frameSize.h * exportScale;
-            
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-            
-            ctx.translate(cx, cy);
-            ctx.translate(transform.x * exportScale, transform.y * exportScale);
-            ctx.scale(transform.scale * exportScale, transform.scale * exportScale);
-            
-            // Draw image exactly centered around its origin
-            ctx.drawImage(cropImage, -imageNaturalSize.w / 2, -imageNaturalSize.h / 2, imageNaturalSize.w, imageNaturalSize.h);
-            
-            canvas.toBlob((blob) => {
-                if(blob) {
-                    const originalFile = uploadedFiles[currentCropIndex];
-                    const newFile = new File([blob], "cropped_" + originalFile.name, { type: 'image/jpeg' });
-                    uploadedFiles[currentCropIndex] = newFile;
-                    renderGallery();
-                    closeCrop();
-                }
-            }, 'image/jpeg', 0.85); // 0.85 compression optimization
-        });
-    }
+        if (photoGallery.contains(loaderDiv)) loaderDiv.remove();
+        renderGallery();
+    });
 
     // Form Submit
     creatorForm.addEventListener('submit', async (e) => {
@@ -458,6 +319,7 @@ if (creatorForm) {
         const name = document.getElementById('name').value.trim();
         const message = document.getElementById('message').value.trim();
         let selectedOccasion = occasionSelect ? occasionSelect.value : 'Birthday';
+        
         if (selectedOccasion === 'Custom' && customOccasionInput) {
             selectedOccasion = customOccasionInput.value.trim();
         }
