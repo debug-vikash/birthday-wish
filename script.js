@@ -197,6 +197,7 @@ if (creatorForm) {
     // Preview Photos before Upload
     let uploadedFiles = [];
     const photoGallery = document.getElementById('photo-gallery');
+    let objectUrls = [];
 
     window.openCropModal = function(index) {
         currentCropIndex = index;
@@ -223,20 +224,58 @@ if (creatorForm) {
     function renderGallery() {
         if(!photoGallery) return;
         photoGallery.innerHTML = '';
-        uploadedFiles.forEach((file, index) => {
+        
+        // Revoke old URLs to prevent memory leaks
+        objectUrls.forEach(url => URL.revokeObjectURL(url));
+        objectUrls = [];
+        
+        if (uploadedFiles.length === 0) return;
+        
+        const loaderDiv = document.createElement('div');
+        loaderDiv.className = 'col-span-full text-center text-sm font-bold text-primary animate-pulse py-2';
+        loaderDiv.innerText = 'Extracting memories...';
+        photoGallery.appendChild(loaderDiv);
+
+        let i = 0;
+        function renderNext() {
+            if (i >= uploadedFiles.length) {
+                if (photoGallery.contains(loaderDiv)) loaderDiv.remove();
+                return;
+            }
+            
+            const file = uploadedFiles[i];
             const url = URL.createObjectURL(file);
+            objectUrls.push(url);
+            
             const div = document.createElement('div');
-            div.className = 'relative group aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-200';
+            div.className = 'relative group aspect-square rounded-xl overflow-hidden shadow-sm border border-gray-200 opacity-0 transition-opacity duration-500';
             div.innerHTML = `
                 <img src="${url}" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer" onclick="openCropModal(${index})">
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer" onclick="openCropModal(${i})">
                     <button type="button" class="bg-white text-primary p-2 rounded-full hover:scale-110 transition-transform shadow-lg flex items-center">
                         <span class="material-symbols-outlined pointer-events-none tracking-normal">crop</span>
                     </button>
                 </div>
             `;
-            photoGallery.appendChild(div);
-        });
+            
+            if (photoGallery.contains(loaderDiv)) {
+                photoGallery.insertBefore(div, loaderDiv);
+            } else {
+                photoGallery.appendChild(div);
+            }
+            
+            // Fade in naturally
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    div.classList.remove('opacity-0');
+                });
+            });
+            
+            i++;
+            setTimeout(renderNext, 200); // 200ms breathing room for mobile browser to parse heavy JPEGs
+        }
+        
+        renderNext();
     }
 
     photosInput.addEventListener('change', () => {
