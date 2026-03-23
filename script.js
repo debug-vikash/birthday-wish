@@ -9,7 +9,7 @@ if (typeof window.supabase !== 'undefined') {
 }
 
 // Utilities
-const SHAPES = ['clip-heart', 'shape-circle', 'shape-blob', 'shape-diamond', 'shape-star'];
+const SHAPES = ['shape-blob', 'shape-tilted-polygon', 'shape-soft-wave', 'shape-asymmetric', 'shape-broken-heart'];
 const DIRECTIONS = ['slide-enter-left', 'slide-enter-right', 'slide-enter-top', 'slide-enter-bottom'];
 
 // Global background particles
@@ -33,6 +33,9 @@ createBackgroundParticles();
 // ====== CREATOR PAGE LOGIC ======
 const creatorForm = document.getElementById('creator-form');
 if (creatorForm) {
+    const occasionSelect = document.getElementById('occasion');
+    const customOccasionContainer = document.getElementById('custom-occasion-container');
+    const customOccasionInput = document.getElementById('custom-occasion');
     const photosInput = document.getElementById('photos');
     const previewContainer = document.getElementById('preview-container');
     const mobilePreview = document.getElementById('mobile-preview');
@@ -44,15 +47,113 @@ if (creatorForm) {
     const musicInput = document.getElementById('music');
     const musicFilenameDisplay = document.getElementById('music-filename');
 
-    // Update Music Filename Display
+    // Toggle Custom Occasion Input
+    if (occasionSelect) {
+        occasionSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'Custom') {
+                customOccasionContainer.classList.remove('hidden');
+                customOccasionInput.required = true;
+            } else {
+                customOccasionContainer.classList.add('hidden');
+                customOccasionInput.required = false;
+            }
+        });
+    }
+
+    // Music Trim Elements
+    const musicTrimContainer = document.getElementById('music-trim-container');
+    const trimStart = document.getElementById('trim-start');
+    const trimEnd = document.getElementById('trim-end');
+    const thumbStart = document.getElementById('thumb-start');
+    const thumbEnd = document.getElementById('thumb-end');
+    const trimRangeHighlight = document.getElementById('trim-range-highlight');
+    const trimStartDisplay = document.getElementById('trim-start-display');
+    const trimEndDisplay = document.getElementById('trim-end-display');
+    const trimDurationDisplay = document.getElementById('trim-duration-display');
+    const previewTrimBtn = document.getElementById('preview-trim-btn');
+    const previewTrimIcon = document.getElementById('preview-trim-icon');
+    const hiddenAudioPlayer = document.getElementById('hidden-audio-player');
+
+    let audioDuration = 0;
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function updateTrimUI() {
+        if (Number(trimStart.value) >= Number(trimEnd.value) - 0.5) {
+            trimStart.value = Number(trimEnd.value) - 0.5;
+        }
+        if (Number(trimEnd.value) <= Number(trimStart.value) + 0.5) {
+            trimEnd.value = Number(trimStart.value) + 0.5;
+        }
+
+        const startPct = (trimStart.value / audioDuration) * 100;
+        const endPct = (trimEnd.value / audioDuration) * 100;
+
+        thumbStart.style.left = `${startPct}%`;
+        thumbEnd.style.left = `${endPct}%`;
+        trimRangeHighlight.style.left = `${startPct}%`;
+        trimRangeHighlight.style.width = `${endPct - startPct}%`;
+
+        trimStartDisplay.innerText = formatTime(trimStart.value);
+        trimEndDisplay.innerText = formatTime(trimEnd.value);
+        trimDurationDisplay.innerText = `Total: ${Math.floor(trimEnd.value - trimStart.value)}s`;
+    }
+
+    if (trimStart) trimStart.addEventListener('input', updateTrimUI);
+    if (trimEnd) trimEnd.addEventListener('input', updateTrimUI);
+
+    if (previewTrimBtn) {
+        previewTrimBtn.addEventListener('click', () => {
+            if (hiddenAudioPlayer.paused) {
+                hiddenAudioPlayer.currentTime = trimStart.value;
+                hiddenAudioPlayer.play();
+                previewTrimIcon.innerText = 'pause';
+            } else {
+                hiddenAudioPlayer.pause();
+                previewTrimIcon.innerText = 'play_arrow';
+            }
+        });
+
+        hiddenAudioPlayer.addEventListener('timeupdate', () => {
+            if (hiddenAudioPlayer.currentTime >= trimEnd.value) {
+                hiddenAudioPlayer.pause();
+                hiddenAudioPlayer.currentTime = trimStart.value;
+                previewTrimIcon.innerText = 'play_arrow';
+            }
+        });
+    }
+
+    // Update Music Filename Display and Initialize Trim
     if(musicInput) {
         musicInput.addEventListener('change', (e) => {
             if(e.target.files.length > 0) {
-                musicFilenameDisplay.innerText = e.target.files[0].name;
+                const file = e.target.files[0];
+                musicFilenameDisplay.innerText = file.name;
                 musicFilenameDisplay.classList.add('text-primary');
+                
+                // Load audio to get duration
+                const objectUrl = URL.createObjectURL(file);
+                hiddenAudioPlayer.src = objectUrl;
+                hiddenAudioPlayer.onloadedmetadata = () => {
+                    audioDuration = hiddenAudioPlayer.duration;
+                    trimStart.max = audioDuration;
+                    trimEnd.max = audioDuration;
+                    trimStart.value = 0;
+                    trimEnd.value = audioDuration;
+                    updateTrimUI();
+                    
+                    if (musicTrimContainer) musicTrimContainer.classList.remove('hidden');
+                };
             } else {
                 musicFilenameDisplay.innerText = "Tap to select an audio file";
                 musicFilenameDisplay.classList.remove('text-primary');
+                if (musicTrimContainer) musicTrimContainer.classList.add('hidden');
+                hiddenAudioPlayer.pause();
+                hiddenAudioPlayer.src = "";
             }
         });
     }
@@ -71,45 +172,225 @@ if (creatorForm) {
     }, 2500);
 
     // Preview Photos before Upload
-    photosInput.addEventListener('change', () => {
-        if(previewContainer) previewContainer.innerHTML = '';
-        if(mobilePreview) mobilePreview.innerHTML = '';
+    let uploadedFiles = [];
+    const photoGallery = document.getElementById('photo-gallery');
+
+    window.openCropModal = function(index) {
+        currentCropIndex = index;
+        const file = uploadedFiles[index];
+        cropImage.src = URL.createObjectURL(file);
         
-        const files = Array.from(photosInput.files).slice(0, 10);
-        files.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                // Desktop Floating Preview
-                if(previewContainer) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-                    img.className = `preview-card ${randomShape}`;
-                    // Random starting position and delay
-                    img.style.left = `${Math.random() * 70 + 10}%`;
-                    img.style.top = `${Math.random() * 60 + 10}%`;
-                    img.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 5}s`;
-                    previewContainer.appendChild(img);
-                }
-                
-                // Mobile Inline Preview
-                if(mobilePreview) {
-                    const mImg = document.createElement('img');
-                    mImg.src = e.target.result;
-                    mImg.className = 'mobile-preview-img object-cover rounded-xl';
-                    mobilePreview.appendChild(mImg);
-                }
-            };
-            reader.readAsDataURL(file);
+        cropImage.onload = () => {
+            imageNaturalSize = { w: cropImage.naturalWidth, h: cropImage.naturalHeight };
+            transform = { x: 0, y: 0, scale: 1 };
+            if (cropZoom) cropZoom.value = 1;
+            
+            updateFrameSize();
+            fitImageToFrame();
+            updateImageTransform();
+            
+            cropModal.classList.remove('hidden');
+            setTimeout(() => {
+                cropModal.classList.remove('opacity-0');
+                cropModalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        };
+    };
+
+    function renderGallery() {
+        if(!photoGallery) return;
+        photoGallery.innerHTML = '';
+        uploadedFiles.forEach((file, index) => {
+            const url = URL.createObjectURL(file);
+            const div = document.createElement('div');
+            div.className = 'relative group aspect-square rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-200';
+            div.innerHTML = `
+                <img src="${url}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer" onclick="openCropModal(${index})">
+                    <button type="button" class="bg-white text-primary p-2 rounded-full hover:scale-110 transition-transform shadow-lg flex items-center">
+                        <span class="material-symbols-outlined pointer-events-none tracking-normal">crop</span>
+                    </button>
+                </div>
+            `;
+            photoGallery.appendChild(div);
         });
+    }
+
+    photosInput.addEventListener('change', () => {
+        if(photoGallery) photoGallery.innerHTML = '';
+        if(previewContainer) previewContainer.innerHTML = ''; 
+        
+        uploadedFiles = Array.from(photosInput.files).slice(0, 10);
+        renderGallery();
     });
+
+    // Photo Crop Modal Logic
+    const cropModal = document.getElementById('crop-modal');
+    const cropModalContent = document.getElementById('crop-modal-content');
+    const closeCropBtn = document.getElementById('close-crop-btn');
+    const applyCropBtn = document.getElementById('apply-crop-btn');
+    const cropImage = document.getElementById('crop-image');
+    const cropFrame = document.getElementById('crop-frame');
+    const cropContainer = document.getElementById('crop-container');
+    const cropZoom = document.getElementById('crop-zoom');
+    const cropRatio = document.getElementById('crop-ratio');
+    const cropShapeSelect = document.getElementById('crop-shape');
+    
+    let currentCropIndex = -1;
+    let transform = { x: 0, y: 0, scale: 1 };
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let frameSize = { w: 250, h: 250 };
+    let imageNaturalSize = { w: 0, h: 0 };
+
+    function closeCrop() {
+        cropModal.classList.add('opacity-0');
+        cropModalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            cropModal.classList.add('hidden');
+            cropImage.src = '';
+        }, 300);
+    }
+    
+    if(closeCropBtn) closeCropBtn.addEventListener('click', closeCrop);
+
+    function updateFrameSize() {
+        const ratio = parseFloat(cropRatio.value);
+        let baseW = 250;
+        let baseH = 250;
+        
+        if (ratio < 1) { // vertical
+            baseW = 250 * ratio;
+        } else if (ratio > 1) { // horizontal
+            baseH = 250 / ratio;
+        }
+        
+        frameSize = { w: baseW, h: baseH };
+        cropFrame.style.width = `${baseW}px`;
+        cropFrame.style.height = `${baseH}px`;
+    }
+
+    function fitImageToFrame() {
+        const scaleX = frameSize.w / imageNaturalSize.w;
+        const scaleY = frameSize.h / imageNaturalSize.h;
+        const minScale = Math.max(scaleX, scaleY);
+        
+        transform.scale = minScale;
+        cropImage.style.width = `${imageNaturalSize.w}px`;
+        cropImage.style.height = `${imageNaturalSize.h}px`;
+        transform.x = 0;
+        transform.y = 0;
+        
+        cropZoom.min = minScale;
+        cropZoom.max = Math.max(minScale * 5, 2);
+        cropZoom.value = minScale;
+    }
+
+    function updateImageTransform() {
+        cropImage.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
+    }
+
+    if (cropRatio) {
+        cropRatio.addEventListener('change', () => {
+            updateFrameSize();
+            fitImageToFrame();
+            updateImageTransform();
+        });
+    }
+
+    if (cropShapeSelect) {
+        cropShapeSelect.addEventListener('change', () => {
+             const val = cropShapeSelect.value;
+             cropFrame.style.borderRadius = '0';
+             cropFrame.style.clipPath = 'none';
+             cropFrame.classList.remove('shape-blob');
+             
+             if (val === 'shape-blob') {
+                 cropFrame.classList.add('shape-blob');
+             } else if (val === 'shape-circle') {
+                 cropFrame.style.borderRadius = '50%';
+             } else if (val === 'shape-broken-heart') {
+                 cropFrame.style.clipPath = 'polygon(50% 20%, 80% 0, 100% 30%, 50% 100%, 0 30%, 20% 0)';
+             }
+        });
+    }
+
+    if (cropContainer) {
+        const startDrag = (e) => {
+            isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            dragStart = { x: clientX - transform.x, y: clientY - transform.y };
+            if(!e.touches) e.preventDefault();
+        };
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            e.preventDefault(); 
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            transform.x = clientX - dragStart.x;
+            transform.y = clientY - dragStart.y;
+            updateImageTransform();
+        };
+        const endDrag = () => { isDragging = false; };
+        
+        cropContainer.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', doDrag);
+        window.addEventListener('mouseup', endDrag);
+        
+        cropContainer.addEventListener('touchstart', startDrag, {passive: false});
+        window.addEventListener('touchmove', doDrag, {passive: false});
+        window.addEventListener('touchend', endDrag);
+    }
+
+    if (cropZoom) {
+        cropZoom.addEventListener('input', () => {
+            transform.scale = parseFloat(cropZoom.value);
+            updateImageTransform();
+        });
+    }
+
+    if (applyCropBtn) {
+        applyCropBtn.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const exportScale = 2; // high-res edge tracing
+            canvas.width = frameSize.w * exportScale;
+            canvas.height = frameSize.h * exportScale;
+            
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            
+            ctx.translate(cx, cy);
+            ctx.translate(transform.x * exportScale, transform.y * exportScale);
+            ctx.scale(transform.scale * exportScale, transform.scale * exportScale);
+            
+            // Draw image exactly centered around its origin
+            ctx.drawImage(cropImage, -imageNaturalSize.w / 2, -imageNaturalSize.h / 2, imageNaturalSize.w, imageNaturalSize.h);
+            
+            canvas.toBlob((blob) => {
+                if(blob) {
+                    const originalFile = uploadedFiles[currentCropIndex];
+                    const newFile = new File([blob], "cropped_" + originalFile.name, { type: 'image/jpeg' });
+                    uploadedFiles[currentCropIndex] = newFile;
+                    renderGallery();
+                    closeCrop();
+                }
+            }, 'image/jpeg', 0.85); // 0.85 compression optimization
+        });
+    }
 
     // Form Submit
     creatorForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('name').value.trim();
         const message = document.getElementById('message').value.trim();
-        const files = Array.from(photosInput.files).slice(0, 10);
+        let selectedOccasion = occasionSelect ? occasionSelect.value : 'Birthday';
+        if (selectedOccasion === 'Custom' && customOccasionInput) {
+            selectedOccasion = customOccasionInput.value.trim();
+        }
+        const files = uploadedFiles.slice(0, 10);
         const musicFile = musicInput && musicInput.files.length > 0 ? musicInput.files[0] : null;
 
         if (files.length === 0) {
@@ -174,8 +455,11 @@ if (creatorForm) {
                 .insert([{ 
                     name: name, 
                     wish_message: message, 
+                    occasion: selectedOccasion,
                     photo_urls: photoUrls,
-                    music_url: musicUrl
+                    music_url: musicUrl,
+                    music_start_time: Number(trimStart.value) || null,
+                    music_end_time: Number(trimEnd.value) || null
                 }])
                 .select();
 
@@ -246,23 +530,64 @@ if (viewerBody) {
     const finalScreen = document.getElementById('final-screen');
     const customMessageText = document.getElementById('custom-message-text');
     const customMessageCard = document.getElementById('custom-message-card');
+    const watchAgainBtn = document.getElementById('watch-again-btn');
 
     let loadedPhotos = [];
     let loadedMessage = "";
+    let musicStartTime = 0;
+    let musicEndTime = null;
 
     // Safely and Softly Fade in Audio 
-    function fadeAudioIn(audio, targetVolume = 0.4, step = 0.05, interval = 200) {
+    function fadeAudioIn(audio, targetVolume = 0.4, step = 0.05, interval = 100) {
         audio.volume = 0;
-        audio.play().catch(e => console.log("Audio play blocked by browser. User must interact first.", e));
+        let playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                isPlaying = true;
+                if(musicBtn) musicBtn.innerHTML = '⏸ Pause Music';
+                
+                let fadeAudio = setInterval(function () {
+                    if (audio.volume < targetVolume - step) {
+                        audio.volume += step;
+                    } else {
+                        audio.volume = targetVolume;
+                        clearInterval(fadeAudio);
+                    }
+                }, interval);
+            }).catch(e => {
+                console.log("Audio play blocked by browser. User must interact first.", e);
+                isPlaying = false;
+                if(musicBtn) musicBtn.innerHTML = '♪ Play Music';
+            });
+        }
+    }
+
+    function playOptimizedMusic() {
+        bgMusic.currentTime = musicStartTime;
+        fadeAudioIn(bgMusic, 0.4);
         
-        let fadeAudio = setInterval(function () {
-            if (audio.volume < targetVolume - step) {
-                audio.volume += step;
-            } else {
-                audio.volume = targetVolume;
-                clearInterval(fadeAudio);
+        let targetEndTime = musicEndTime && musicEndTime > 0 ? musicEndTime : bgMusic.duration || 12;
+
+        // Loop within set segment bounds
+        bgMusic.ontimeupdate = () => {
+            if (bgMusic.currentTime >= targetEndTime - 0.5) { // start fade out 0.5s before loop end
+                if (!bgMusic.isFadingOut) {
+                    bgMusic.isFadingOut = true;
+                    // Quick fade out
+                    let fadeOutInterval = setInterval(() => {
+                        if (bgMusic.volume > 0.05) {
+                            bgMusic.volume -= 0.05;
+                        } else {
+                            bgMusic.volume = 0;
+                            clearInterval(fadeOutInterval);
+                            bgMusic.currentTime = musicStartTime;
+                            bgMusic.isFadingOut = false;
+                            fadeAudioIn(bgMusic, 0.4, 0.05, 50); // Fast fade in
+                        }
+                    }, 50);
+                }
             }
-        }, interval);
+        };
     }
 
     musicBtn.addEventListener('click', () => {
@@ -271,9 +596,12 @@ if (viewerBody) {
             musicBtn.innerHTML = '♪ Play Music';
             isPlaying = false;
         } else {
-            fadeAudioIn(bgMusic, 0.4);
-            musicBtn.innerHTML = '⏸ Pause Music';
-            isPlaying = true;
+            let targetEndTime = musicEndTime && musicEndTime > 0 ? musicEndTime : bgMusic.duration || 12;
+            if (bgMusic.currentTime < musicStartTime || bgMusic.currentTime > targetEndTime) {
+                playOptimizedMusic();
+            } else {
+                fadeAudioIn(bgMusic, 0.4);
+            }
         }
     });
 
@@ -293,13 +621,27 @@ if (viewerBody) {
             if (error || !data) throw error;
 
             bdayNameSpan.innerText = data.name;
+            const occasionTextSpan = document.getElementById('occasion-text');
+            if (occasionTextSpan) {
+                occasionTextSpan.innerText = data.occasion || 'Birthday';
+            }
             loadedPhotos = data.photo_urls || [];
             loadedMessage = data.wish_message || "";
+            musicStartTime = data.music_start_time || 0;
+            musicEndTime = data.music_end_time || null;
             
             // Apply custom music if user uploaded it
             if (data.music_url) {
                 bgMusic.src = data.music_url;
                 bgMusic.load();
+                
+                // wait for metadata to set duration correctly if no explicit end time
+                bgMusic.onloadedmetadata = () => {
+                    if(!musicEndTime) musicEndTime = bgMusic.duration;
+                    playOptimizedMusic();
+                }
+            } else {
+                playOptimizedMusic();
             }
 
             loader.classList.add('hidden');
@@ -440,7 +782,7 @@ if (viewerBody) {
             const randomDirection = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
             const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
             
-            img.className = `slide-ultra ${randomDirection} ${randomShape}`;
+            img.className = `slide-ultra float-rotate-anim ${randomDirection} ${randomShape}`;
             
             // Sparkle Particle Burst on entry (Center of screen approx)
             setTimeout(() => {
@@ -466,6 +808,23 @@ if (viewerBody) {
             setTimeout(() => {
                 img.remove();
             }, 9000);
+        });
+    }
+
+    if (watchAgainBtn) {
+        watchAgainBtn.addEventListener('click', () => {
+            // Hide final screen
+            finalScreen.classList.add('hidden');
+            // Show overlay again and freeze scroll
+            slideshowOverlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Restart audio loop
+            playOptimizedMusic();
+
+            // Run slideshow
+            runSlideshow();
         });
     }
 
