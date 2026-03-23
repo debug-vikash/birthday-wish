@@ -168,8 +168,8 @@
                         <div id="trim-range-highlight" class="absolute top-1/2 -translate-y-1/2 h-2 bg-primary rounded-full z-10 shadow-[0_0_5px_rgba(145,62,108,0.5)]" style="left: 0%; width: 100%;"></div>
                         
                         <!-- Range Sliders (transparent natively, thumb styled) -->
-                        <input type="range" id="trim-start" class="absolute top-1/2 -translate-y-1/2 w-full h-2 opacity-0 z-20 cursor-pointer pointer-events-auto" min="0" max="100" value="0" step="0.1">
-                        <input type="range" id="trim-end" class="absolute top-1/2 -translate-y-1/2 w-full h-2 opacity-0 z-30 cursor-pointer pointer-events-auto" min="0" max="100" value="100" step="0.1">
+                        <input type="range" id="trim-start" class="absolute top-1/2 -translate-y-1/2 w-full h-2 opacity-0 z-20 cursor-pointer pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto" min="0" max="100" value="0" step="0.1">
+                        <input type="range" id="trim-end" class="absolute top-1/2 -translate-y-1/2 w-full h-2 opacity-0 z-40 cursor-pointer pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto" min="0" max="100" value="100" step="0.1">
                         
                         <!-- Visual Thumbs -->
                         <div id="thumb-start" class="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white border-[3px] border-primary rounded-full cursor-grab z-20 pointer-events-none transition-transform hover:scale-110 shadow-lg flex items-center justify-center font-bold text-primary" style="left: 0%; transform: translateX(-50%);"></div>

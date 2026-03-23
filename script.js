@@ -463,7 +463,10 @@ if (creatorForm) {
                 }])
                 .select();
 
-            if (dbError) throw new Error("Failed to save surprise data.");
+            if (dbError) {
+                console.error("Supabase Database Error Details:", dbError);
+                throw new Error("Failed to save surprise data. See console for exact database error.");
+            }
 
             const surpriseId = dbData[0].id;
             const link = `${window.location.origin}/view.html?id=${surpriseId}`;
