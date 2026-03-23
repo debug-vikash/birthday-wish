@@ -540,6 +540,9 @@ if (creatorForm) {
     if (createAnotherBtn) {
         createAnotherBtn.addEventListener('click', () => {
             creatorForm.reset();
+            creatorForm.style.opacity = '1';
+            submitBtn.disabled = false;
+            
             if (photoGallery) photoGallery.innerHTML = '';
             
             if (musicFilenameDisplay) {
