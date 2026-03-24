@@ -182,8 +182,9 @@ if (creatorForm) {
     }
 
     // Floating Emoji Micro Animations
+    window.isProcessing = false;
     setInterval(() => {
-        if (document.hidden) return;
+        if (document.hidden || window.isProcessing) return;
         const emojis = ['❤️', '✨', '🎉', '💖', '🌟'];
         const el = document.createElement('div');
         el.className = 'absolute text-3xl animate-float-text z-50 pointer-events-none opacity-80';
@@ -201,6 +202,15 @@ if (creatorForm) {
 
 
 
+    function clearUploadedFiles() {
+        if (uploadedFiles) {
+            uploadedFiles.forEach(item => {
+                if (item.thumbUrl) URL.revokeObjectURL(item.thumbUrl);
+            });
+        }
+        uploadedFiles = [];
+    }
+
     function renderGallery() {
         if(!photoGallery) return;
         photoGallery.innerHTML = '';
@@ -213,7 +223,7 @@ if (creatorForm) {
         
         const loaderDiv = document.createElement('div');
         loaderDiv.className = 'col-span-full text-center text-sm font-bold text-primary animate-pulse py-2';
-        loaderDiv.innerText = 'Extracting memories...';
+        loaderDiv.innerText = 'Arranging memories...';
         photoGallery.appendChild(loaderDiv);
 
         let i = 0;
@@ -223,14 +233,14 @@ if (creatorForm) {
                 return;
             }
             
-            const file = uploadedFiles[i];
-            const url = URL.createObjectURL(file);
-            objectUrls.push(url);
+            const item = uploadedFiles[i];
+            const url = item.thumbUrl || URL.createObjectURL(item.file);
+            if (!item.thumbUrl) objectUrls.push(url);
             
             const div = document.createElement('div');
             div.className = 'relative group aspect-square rounded-xl overflow-hidden shadow-sm border border-gray-200 opacity-0 transition-opacity duration-500';
             div.innerHTML = `
-                <img src="${url}" class="w-full h-full object-cover shadow-inner">
+                <img src="${url}" loading="lazy" class="w-full h-full object-cover shadow-inner">
             `;
             
             if (photoGallery.contains(loaderDiv)) {
@@ -247,45 +257,67 @@ if (creatorForm) {
             });
             
             i++;
-            setTimeout(renderNext, 200); // 200ms breathing room for mobile browser to parse heavy JPEGs
+            setTimeout(renderNext, 50); // Faster render since it's just thumbnails
         }
         
         renderNext();
     }
 
     // Image Compressor Function for mobile performance
-    function compressImageFile(file, maxWidth = 1080) {
+    function compressImageFile(file, maxWidth = 1000) {
         return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = event => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDim = Math.max(width, height);
-                    if (maxDim > maxWidth) {
-                        const scale = maxWidth / maxDim;
-                        width = Math.floor(width * scale);
-                        height = Math.floor(height * scale);
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => {
+                URL.revokeObjectURL(url); // Release early
+                
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = Math.max(width, height);
+                if (maxDim > maxWidth) {
+                    const scale = maxWidth / maxDim;
+                    width = Math.floor(width * scale);
+                    height = Math.floor(height * scale);
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Create tiny thumbnail for gallery preview
+                const thumbCanvas = document.createElement('canvas');
+                const thumbScale = 150 / Math.max(width, height);
+                const tWidth = Math.floor(width * thumbScale) || 150;
+                const tHeight = Math.floor(height * thumbScale) || 150;
+                thumbCanvas.width = tWidth;
+                thumbCanvas.height = tHeight;
+                const tCtx = thumbCanvas.getContext('2d');
+                tCtx.drawImage(canvas, 0, 0, width, height, 0, 0, tWidth, tHeight);
+                
+                thumbCanvas.toBlob(tBlob => {
+                    const thumbUrl = tBlob ? URL.createObjectURL(tBlob) : null;
+                    
                     canvas.toBlob(blob => {
+                        // Cleanup image reference
+                        img.src = '';
+                        img.onload = null;
+                        img.onerror = null;
+                        
                         if(blob) {
-                            resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg', lastModified: Date.now() });
+                            resolve({ file: newFile, thumbUrl: thumbUrl });
                         } else {
-                            resolve(file); // fallback
+                            resolve({ file: file, thumbUrl: thumbUrl }); // fallback
                         }
-                    }, 'image/jpeg', 0.85); // Compress quality to 85%
-                };
-                img.onerror = () => resolve(file); // fallback
+                    }, 'image/jpeg', 0.75); // Compress quality to 75%
+                }, 'image/jpeg', 0.5);
             };
-            reader.onerror = () => resolve(file); // fallback
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                resolve({ file: file, thumbUrl: null }); // fallback
+            };
+            img.src = url;
         });
     }
 
@@ -296,18 +328,22 @@ if (creatorForm) {
         const filesToProcess = Array.from(photosInput.files).slice(0, 10);
         if (filesToProcess.length === 0) return;
 
+        window.isProcessing = true; // Pause animations
+
         // Show generic processing state
         const loaderDiv = document.createElement('div');
         loaderDiv.className = 'col-span-full text-center text-sm font-bold text-primary animate-pulse py-4 bg-pink-50 rounded-xl';
         loaderDiv.innerText = 'Optimizing and compressing photos...';
         photoGallery.appendChild(loaderDiv);
 
-        uploadedFiles = [];
+        clearUploadedFiles();
         // Compress sequentially to save RAM on budget phones
         for (let i = 0; i < filesToProcess.length; i++) {
-            const compressedFile = await compressImageFile(filesToProcess[i], 1080);
-            uploadedFiles.push(compressedFile);
+            const result = await compressImageFile(filesToProcess[i], 1000);
+            uploadedFiles.push(result);
         }
+        
+        window.isProcessing = false; // Resume animations
         
         if (photoGallery.contains(loaderDiv)) loaderDiv.remove();
         renderGallery();
@@ -323,85 +359,109 @@ if (creatorForm) {
         if (selectedOccasion === 'Custom' && customOccasionInput) {
             selectedOccasion = customOccasionInput.value.trim();
         }
-        const files = uploadedFiles.slice(0, 10);
-        const musicFile = musicInput && musicInput.files.length > 0 ? musicInput.files[0] : null;
+            const files = uploadedFiles.slice(0, 10).map(i => i.file);
+            const musicFile = musicInput && musicInput.files.length > 0 ? musicInput.files[0] : null;
 
-        if (files.length === 0) {
-            alert("Please upload at least one photo!");
-            return;
-        }
-
-        if (!SUPABASE_URL || !supabaseClient) {
-            alert("Supabase is not configured properly.");
-            return;
-        }
-
-        // Show loading state
-        submitBtn.disabled = true;
-        creatorForm.style.opacity = '0.5';
-        loadingDiv.classList.remove('hidden');
-
-        try {
-            const photoUrls = [];
-            let musicUrl = null;
-            const timestamp = Date.now();
-            const safeNameFolder = name.replace(/[^a-zA-Z0-9]/g, '_');
-
-            // 1. Upload Music (If selected)
-            if (musicFile) {
-                const musicExt = musicFile.name.split('.').pop();
-                const musicFileName = `music_${timestamp}.${musicExt}`;
-                
-                const { error: musicError } = await supabaseClient.storage
-                    .from('birthday-music')
-                    .upload(`${safeNameFolder}/${musicFileName}`, musicFile, { cacheControl: '3600', upsert: false });
-                
-                if (musicError) throw new Error("Music upload failed. Ensure 'birthday-music' bucket is public and RLS is enabled correctly.");
-                
-                const { data: musicPublicUrlData } = supabaseClient.storage
-                    .from('birthday-music')
-                    .getPublicUrl(`${safeNameFolder}/${musicFileName}`);
-                musicUrl = musicPublicUrlData.publicUrl;
+            if (files.length === 0) {
+                alert("Please upload at least one photo!");
+                return;
             }
 
-            // 2. Upload Photos
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${timestamp}_${i}.${fileExt}`;
-
-                const { data, error } = await supabaseClient.storage
-                    .from('birthday-photos')
-                    .upload(`${safeNameFolder}/${fileName}`, file, { cacheControl: '3600', upsert: false });
-
-                if (error) throw new Error("Upload failed. Ensure bucket is correctly configured.");
-
-                const { data: publicUrlData } = supabaseClient.storage
-                    .from('birthday-photos')
-                    .getPublicUrl(`${safeNameFolder}/${fileName}`);
-                photoUrls.push(publicUrlData.publicUrl);
+            if (!SUPABASE_URL || !supabaseClient) {
+                alert("Supabase is not configured properly.");
+                return;
             }
 
-            // 3. Insert Database Record
-            const { data: dbData, error: dbError } = await supabaseClient
-                .from('surprises')
-                .insert([{ 
-                    name: name, 
-                    wish_message: message, 
-                    occasion: selectedOccasion,
-                    photo_urls: photoUrls,
-                    music_url: musicUrl,
-                    music_start_time: Number(trimStart.value) || null,
-                    music_end_time: Number(trimEnd.value) || null
-                }])
-                .select();
+            window.isProcessing = true; // Pause animations during upload
 
-            if (dbError) {
-                console.error("Supabase Database Error Details:", dbError);
-                throw new Error("Failed to save surprise data. See console for exact database error.");
+            // Show loading state
+            submitBtn.disabled = true;
+            creatorForm.style.opacity = '0.5';
+            loadingDiv.classList.remove('hidden');
+            
+            const loadingText = document.getElementById('loading-text');
+            const progressContainer = document.getElementById('upload-progress-container');
+            const progressBar = document.getElementById('upload-progress-bar');
+            
+            if (loadingText) loadingText.innerText = "Processing magic...";
+            if (progressContainer) {
+                progressContainer.classList.remove('hidden');
+                progressBar.style.width = '5%';
             }
 
-            const surpriseId = dbData[0].id;
+            try {
+                const photoUrls = [];
+                let musicUrl = null;
+                const timestamp = Date.now();
+                const safeNameFolder = name.replace(/[^a-zA-Z0-9]/g, '_');
+
+                // 1. Upload Music (If selected)
+                if (musicFile) {
+                    if (loadingText) loadingText.innerText = "Uploading background music...";
+                    const musicExt = musicFile.name.split('.').pop();
+                    const musicFileName = `music_${timestamp}.${musicExt}`;
+                    
+                    const { error: musicError } = await supabaseClient.storage
+                        .from('birthday-music')
+                        .upload(`${safeNameFolder}/${musicFileName}`, musicFile, { cacheControl: '3600', upsert: false });
+                    
+                    if (musicError) throw new Error("Music upload failed. Ensure 'birthday-music' bucket is public and RLS is enabled correctly.");
+                    
+                    const { data: musicPublicUrlData } = supabaseClient.storage
+                        .from('birthday-music')
+                        .getPublicUrl(`${safeNameFolder}/${musicFileName}`);
+                    musicUrl = musicPublicUrlData.publicUrl;
+                }
+
+                // 2. Upload Photos sequentially with progress
+                for (let i = 0; i < files.length; i++) {
+                    if (loadingText) loadingText.innerText = `Uploading photo ${i + 1} of ${files.length}...`;
+                    const file = files[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${timestamp}_${i}.${fileExt}`;
+
+                    const { data, error } = await supabaseClient.storage
+                        .from('birthday-photos')
+                        .upload(`${safeNameFolder}/${fileName}`, file, { cacheControl: '3600', upsert: false });
+
+                    if (error) throw new Error("Upload failed. Ensure bucket is correctly configured.");
+
+                    const { data: publicUrlData } = supabaseClient.storage
+                        .from('birthday-photos')
+                        .getPublicUrl(`${safeNameFolder}/${fileName}`);
+                    photoUrls.push(publicUrlData.publicUrl);
+                    
+                    if (progressBar) {
+                        const pct = 10 + Math.floor(((i + 1) / files.length) * 80); // 10% to 90%
+                        progressBar.style.width = `${pct}%`;
+                    }
+                }
+
+                if (loadingText) loadingText.innerText = "Creating surprise link...";
+                if (progressBar) progressBar.style.width = '95%';
+
+                // 3. Insert Database Record
+                const { data: dbData, error: dbError } = await supabaseClient
+                    .from('surprises')
+                    .insert([{ 
+                        name: name, 
+                        wish_message: message, 
+                        occasion: selectedOccasion,
+                        photo_urls: photoUrls,
+                        music_url: musicUrl,
+                        music_start_time: Number(trimStart.value) || null,
+                        music_end_time: Number(trimEnd.value) || null
+                    }])
+                    .select();
+
+                if (dbError) {
+                    console.error("Supabase Database Error Details:", dbError);
+                    throw new Error("Failed to save surprise data. See console for exact database error.");
+                }
+
+                if (progressBar) progressBar.style.width = '100%';
+
+                const surpriseId = dbData[0].id;
             const link = `${window.location.origin}/view.html?id=${surpriseId}`;
             shareLinkInput.value = link;
 
@@ -411,12 +471,15 @@ if (creatorForm) {
 
             if (previewContainer) previewContainer.innerHTML = ''; // Clear floating previews to focus on success
 
+            window.isProcessing = false; // Resume animations
+
         } catch (error) {
             console.error(error);
             alert("Error: " + error.message);
             submitBtn.disabled = false;
             creatorForm.style.opacity = '1';
             loadingDiv.classList.add('hidden');
+            window.isProcessing = false; // Resume animations in case of error
         }
     });
 
@@ -455,7 +518,7 @@ if (creatorForm) {
             if (customOccasionContainer) customOccasionContainer.classList.add('hidden');
             if (customOccasionInput) customOccasionInput.required = false;
             
-            uploadedFiles = [];
+            clearUploadedFiles();
             successPopup.classList.add('hidden');
             creatorForm.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
