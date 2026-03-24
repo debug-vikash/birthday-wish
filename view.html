@@ -26,7 +26,7 @@
         ♪ Play Music
     </button>
     <audio id="bg-music" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2023/06/15/audio_1cd7f2f9b6.mp3" type="audio/mpeg">
+        <source src="" type="audio/mpeg">
     </audio>
 
     <div id="loader"
@@ -54,15 +54,19 @@
         </h1>
 
         <button id="preview-animation-btn"
-            class="mt-10 sm:mt-16 pointer-events-auto jelly-btn bg-white/20 hover:bg-white/40 backdrop-blur-2xl border-2 border-white px-8 py-4 sm:px-12 sm:py-6 rounded-full text-lg sm:text-2xl font-bold shadow-[0_0_30px_rgba(255,153,204,0.8)] sm:shadow-[0_0_50px_rgba(255,153,204,0.8)] transition-all animate-pulse-gentle flex items-center justify-center gap-2 sm:gap-3 text-white">
-            <span>✨</span> Start The Magic <span>✨</span>
+            class="mt-10 sm:mt-16 pointer-events-auto jelly-btn bg-gradient-to-r from-primary to-primary-fixed hover:from-pink-600 hover:to-pink-400 backdrop-blur-2xl border-2 border-white/80 px-8 py-4 sm:px-12 sm:py-6 rounded-full text-lg sm:text-2xl font-extrabold shadow-[0_10px_30px_rgba(255,153,204,0.8)] sm:shadow-[0_15px_50px_rgba(255,153,204,0.8)] transition-all animate-pulse-gentle flex items-center justify-center gap-2 sm:gap-3 text-white shimmer-btn magic-btn-hover premium-floating z-50">
+            <span class="animate-bounce">✨</span> Start The Magic <span class="animate-bounce"
+                style="animation-delay: 0.5s">✨</span>
         </button>
 
-        <div class="mt-8 flex flex-col items-center gap-1.5 px-6 py-2 rounded-full bg-pink-600/60 border border-white/40 animate-[pulse_3s_ease-in-out_infinite] shadow-[0_0_20px_rgba(255,105,180,0.4)] pointer-events-auto">
-            <span class="text-white font-bold tracking-widest text-[11px] sm:text-sm uppercase drop-shadow-md text-center">
-                Try catching the hearts first!
+        <div
+            class="mt-8 flex flex-col items-center gap-1.5 px-8 py-5 bg-white/20 backdrop-blur-2xl border border-white/50 animate-[pulse_3s_ease-in-out_infinite] shadow-[0_10px_30px_rgba(255,105,180,0.3)] pointer-events-auto shape-blob relative group premium-floating">
+            <span
+                class="text-white font-bold tracking-widest text-xs sm:text-sm uppercase text-center premium-text-glow z-10">
+                Touch the hearts first!
             </span>
-            <span class="material-symbols-outlined text-white text-2xl animate-bounce pointer-events-none drop-shadow-md">touch_app</span>
+            <span
+                class="material-symbols-outlined text-white text-3xl animate-bounce pointer-events-none drop-shadow-md z-10 mt-1">touch_app</span>
         </div>
     </div>
 
@@ -73,10 +77,12 @@
     <!-- Heart Click Photo Frame -->
     <div id="photo-frame-popup"
         class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-xl pointer-events-auto transition-opacity duration-300 p-4">
-        <div class="relative scale-up group max-w-full">
+        <div class="relative group max-w-full">
             <div
-                class="w-64 h-64 sm:w-80 sm:h-80 bg-white/20 backdrop-blur-3xl p-3 sm:p-4 rounded-3xl -rotate-3 hover:rotate-0 transition-transform shadow-[0_20px_60px_rgba(255,153,204,0.6)] border border-white/50 mx-auto">
-                <img id="frame-image" src="" alt="Memory" class="w-full h-full object-cover rounded-2xl shadow-inner">
+                class="w-64 h-64 sm:w-80 sm:h-80 bg-white/20 backdrop-blur-3xl p-3 sm:p-5 shape-soft-wave transition-transform hover:scale-105 shadow-[0_20px_60px_rgba(255,153,204,0.8)] border-2 border-white/70 mx-auto relative group overflow-hidden">
+                <div class="absolute inset-0 border-glow-anim opacity-60 z-0"></div>
+                <img id="frame-image" src="" alt="Memory"
+                    class="w-full h-full object-cover shape-soft-wave shadow-inner relative z-10">
             </div>
             <button id="close-frame-btn"
                 class="absolute -top-4 -right-2 sm:-top-6 sm:-right-6 bg-white text-primary rounded-full w-12 h-12 sm:w-14 sm:h-14 font-black text-2xl sm:text-3xl shadow-2xl hover:scale-125 transition-transform flex justify-center items-center jelly-btn">×</button>
@@ -101,7 +107,7 @@
 
         <!-- Custom Message Card -->
         <div id="custom-message-card"
-            class="hidden w-[95%] sm:w-full max-w-2xl bg-white/10 backdrop-blur-3xl border border-white/40 p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_10px_30px_rgba(255,153,204,0.3)] sm:shadow-[0_20px_50px_rgba(255,153,204,0.3)] animate-message-entrance relative overflow-hidden group mx-auto">
+            class="hidden w-[95%] sm:w-full max-w-2xl bg-white/10 backdrop-blur-3xl border border-white/40 p-10 sm:p-14 shape-blob shadow-[0_10px_30px_rgba(255,153,204,0.3)] sm:shadow-[0_20px_50px_rgba(255,153,204,0.5)] animate-message-entrance relative overflow-hidden group mx-auto premium-floating">
             <!-- Glowing pastel border effect -->
             <div class="absolute inset-0 border-glow-anim opacity-50 z-0"></div>
             <!-- Floating mini hearts around message -->

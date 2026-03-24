@@ -26,6 +26,7 @@
     animation: borderFlow 4s linear infinite;
     padding: 3px;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
 }
@@ -154,7 +155,7 @@
 .animate-pulse-gentle { animation: pulseGentle 1.5s infinite alternate; }
 @keyframes pulseGentle { 0% { box-shadow: 0 0 20px rgba(255,153,204,0.4); } 100% { box-shadow: 0 0 60px rgba(255,153,204,0.9); transform: scale(1.02); } }
 
-.spinner-magical { width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(from 0deg, #ff99cc, #913e6c, #89f7fe, #ff99cc); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff 0); animation: spin 1s linear infinite; }
+.spinner-magical { width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(from 0deg, #ff99cc, #913e6c, #89f7fe, #ff99cc); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff 0); mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #fff 0); animation: spin 1s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* Custom Message Animations */
@@ -207,4 +208,64 @@
     0% { transform: translateY(0px) rotate(0deg); }
     50% { transform: translateY(-20px) rotate(2deg); }
     100% { transform: translateY(10px) rotate(-2deg); }
+}
+
+/* ======== NEW ENHANCEMENTS ======== */
+
+/* Button Shimmer Sweep Effect */
+.shimmer-btn {
+    position: relative;
+    overflow: hidden;
+}
+.shimmer-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-20deg);
+    animation: shimmerSweep 3s infinite;
+}
+@keyframes shimmerSweep {
+    0% { left: -100%; }
+    20% { left: 200%; }
+    100% { left: 200%; }
+}
+
+/* Floating Heart Pop Animation */
+.pop-scale {
+    animation: popScaleAnim 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+@keyframes popScaleAnim {
+    0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+    50% { transform: scale(2.5); opacity: 0.8; filter: brightness(1.5); }
+    100% { transform: scale(0); opacity: 0; filter: brightness(2); }
+}
+
+/* Photo Popup Zoom In Fade */
+.zoom-in-fade {
+    animation: zoomInFadeAnim 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes zoomInFadeAnim {
+    0% { opacity: 0; transform: scale(0.6) translateY(40px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Photo Popup Fade Out Scale */
+.fade-out-scale {
+    animation: fadeOutScaleAnim 0.5s cubic-bezier(0.8, 0, 0.2, 1) forwards !important;
+}
+@keyframes fadeOutScaleAnim {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.8); }
+}
+
+/* Magic Button Hover Pulse */
+.magic-btn-hover {
+    transition: all 0.3s ease;
+}
+.magic-btn-hover:hover {
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.8), 0 0 80px rgba(255, 153, 204, 0.6) !important;
 }

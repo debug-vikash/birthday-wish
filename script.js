@@ -271,47 +271,54 @@ if (creatorForm) {
             img.onload = () => {
                 URL.revokeObjectURL(url); // Release early
                 
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                const maxDim = Math.max(width, height);
-                if (maxDim > maxWidth) {
-                    const scale = maxWidth / maxDim;
-                    width = Math.floor(width * scale);
-                    height = Math.floor(height * scale);
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                // Create tiny thumbnail for gallery preview
-                const thumbCanvas = document.createElement('canvas');
-                const thumbScale = 150 / Math.max(width, height);
-                const tWidth = Math.floor(width * thumbScale) || 150;
-                const tHeight = Math.floor(height * thumbScale) || 150;
-                thumbCanvas.width = tWidth;
-                thumbCanvas.height = tHeight;
-                const tCtx = thumbCanvas.getContext('2d');
-                tCtx.drawImage(canvas, 0, 0, width, height, 0, 0, tWidth, tHeight);
-                
-                thumbCanvas.toBlob(tBlob => {
-                    const thumbUrl = tBlob ? URL.createObjectURL(tBlob) : null;
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = Math.max(width, height);
+                    if (maxDim > maxWidth) {
+                        const scale = maxWidth / maxDim;
+                        width = Math.floor(width * scale);
+                        height = Math.floor(height * scale);
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) throw new Error("Canvas 2D context not available");
                     
-                    canvas.toBlob(blob => {
-                        // Cleanup image reference
-                        img.src = '';
-                        img.onload = null;
-                        img.onerror = null;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Create tiny thumbnail for gallery preview
+                    const thumbCanvas = document.createElement('canvas');
+                    const thumbScale = 150 / Math.max(width, height);
+                    const tWidth = Math.floor(width * thumbScale) || 150;
+                    const tHeight = Math.floor(height * thumbScale) || 150;
+                    thumbCanvas.width = tWidth;
+                    thumbCanvas.height = tHeight;
+                    const tCtx = thumbCanvas.getContext('2d');
+                    if (tCtx) tCtx.drawImage(canvas, 0, 0, width, height, 0, 0, tWidth, tHeight);
+                    
+                    thumbCanvas.toBlob(tBlob => {
+                        const thumbUrl = tBlob ? URL.createObjectURL(tBlob) : null;
                         
-                        if(blob) {
-                            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg', lastModified: Date.now() });
-                            resolve({ file: newFile, thumbUrl: thumbUrl });
-                        } else {
-                            resolve({ file: file, thumbUrl: thumbUrl }); // fallback
-                        }
-                    }, 'image/jpeg', 0.75); // Compress quality to 75%
-                }, 'image/jpeg', 0.5);
+                        canvas.toBlob(blob => {
+                            // Cleanup image reference
+                            img.src = '';
+                            img.onload = null;
+                            img.onerror = null;
+                            
+                            if (blob) {
+                                const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg', lastModified: Date.now() });
+                                resolve({ file: newFile, thumbUrl: thumbUrl });
+                            } else {
+                                resolve({ file: file, thumbUrl: thumbUrl }); // fallback
+                            }
+                        }, 'image/jpeg', 0.75); // Compress quality to 75%
+                    }, 'image/jpeg', 0.5);
+                } catch (err) {
+                    console.error("Compression failed, falling back to original file:", err);
+                    resolve({ file: file, thumbUrl: null });
+                }
             };
             img.onerror = () => {
                 URL.revokeObjectURL(url);
@@ -462,12 +469,12 @@ if (creatorForm) {
                 if (progressBar) progressBar.style.width = '100%';
 
                 const surpriseId = dbData[0].id;
-            const link = `${window.location.origin}/view.html?id=${surpriseId}`;
-            shareLinkInput.value = link;
+                const link = `${window.location.origin}/view.html?id=${surpriseId}`;
+                shareLinkInput.value = link;
 
-            loadingDiv.classList.add('hidden');
-            creatorForm.classList.add('hidden');
-            successPopup.classList.remove('hidden');
+                loadingDiv.classList.add('hidden');
+                creatorForm.classList.add('hidden');
+                successPopup.classList.remove('hidden');
 
             if (previewContainer) previewContainer.innerHTML = ''; // Clear floating previews to focus on success
 
@@ -701,6 +708,9 @@ if (viewerBody) {
             heart.style.animationDuration = duration + 's';
             
             heart.addEventListener('click', (e) => {
+                // Heart pop animation
+                heart.classList.add('pop-scale');
+                
                 // Heart explosion effect using confetti
                 const rect = heart.getBoundingClientRect();
                 const x = (rect.left + rect.width / 2) / window.innerWidth;
@@ -714,17 +724,56 @@ if (viewerBody) {
                         disableForReducedMotion: true
                     });
                 }
-                heart.remove();
                 
-                // Show photo popup
+                // Remove heart after pop animation completes
+                setTimeout(() => heart.remove(), 400);
+                
+                // Show photo popup elegantly
                 const randomPhoto = loadedPhotos[Math.floor(Math.random() * loadedPhotos.length)];
                 frameImage.src = randomPhoto;
-                photoFramePopup.classList.remove('hidden');
+                
+                photoFramePopup.classList.remove('hidden', 'fade-out-scale');
+                photoFramePopup.classList.add('zoom-in-fade');
+                
+                // Auto hide photo popup after 3 seconds
+                if (window.photoHideTimeout) clearTimeout(window.photoHideTimeout);
+                window.photoHideTimeout = setTimeout(() => {
+                    photoFramePopup.classList.remove('zoom-in-fade');
+                    photoFramePopup.classList.add('fade-out-scale');
+                    
+                    // Wait for fade out animation to finish before hiding
+                    setTimeout(() => {
+                        if (photoFramePopup.classList.contains('fade-out-scale')) {
+                            photoFramePopup.classList.add('hidden');
+                        }
+                    }, 500);
+                }, 3000);
             });
             
             heartsContainer.appendChild(heart);
             setTimeout(() => { heart.remove(); }, duration * 1000);
         }, 2000);   // Throttle spawn a heart every 2s instead of 1.2s
+    }
+    
+    // Sparkle burst on Start The Magic button hover
+    if (previewBtn) {
+        previewBtn.addEventListener('mouseenter', (e) => {
+            if (!window.confetti || window.innerWidth < 768) return; // Only hover effect on desktop
+            const rect = previewBtn.getBoundingClientRect();
+            // Create a small burst somewhere on the button
+            const x = (rect.left + Math.random() * rect.width) / window.innerWidth;
+            const y = (rect.top + Math.random() * rect.height) / window.innerHeight;
+            
+            confetti({
+                particleCount: 15,
+                spread: 40,
+                startVelocity: 15,
+                origin: { x, y },
+                colors: ['#ffffff', '#ff99cc', '#ffd1dc'],
+                disableForReducedMotion: true,
+                ticks: 50
+            });
+        });
     }
 
     closeFrameBtn.addEventListener('click', () => {
