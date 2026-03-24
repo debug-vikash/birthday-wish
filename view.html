@@ -76,16 +76,14 @@
 
     <!-- Heart Click Photo Frame -->
     <div id="photo-frame-popup"
-        class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-xl pointer-events-auto transition-opacity duration-300 p-4">
-        <div class="relative group max-w-full">
-            <div
-                class="w-64 h-64 sm:w-80 sm:h-80 bg-white/20 backdrop-blur-3xl p-3 sm:p-5 shape-soft-wave transition-transform hover:scale-105 shadow-[0_20px_60px_rgba(255,153,204,0.8)] border-2 border-white/70 mx-auto relative group overflow-hidden">
-                <div class="absolute inset-0 border-glow-anim opacity-60 z-0"></div>
-                <img id="frame-image" src="" alt="Memory"
-                    class="w-full h-full object-cover shape-soft-wave shadow-inner relative z-10">
+        class="hidden fixed inset-0 flex items-center justify-center z-50 bg-black/30 backdrop-blur-[2px] pointer-events-none transition-opacity duration-300 p-4">
+        <!-- Inner Entrance Container -->
+        <div id="photo-popup-inner" class="relative max-w-full origin-center pointer-events-none">
+            <!-- Floating Container with Drop Shadow Glow -->
+            <div class="w-64 h-64 sm:w-80 sm:h-80 mx-auto premium-floating filter drop-shadow-[0_0_30px_rgba(255,153,204,0.6)]">
+                <!-- Borderless organic image -->
+                <img id="frame-image" src="" alt="Memory" class="w-full h-full object-cover shape-blob">
             </div>
-            <button id="close-frame-btn"
-                class="absolute -top-4 -right-2 sm:-top-6 sm:-right-6 bg-white text-primary rounded-full w-12 h-12 sm:w-14 sm:h-14 font-black text-2xl sm:text-3xl shadow-2xl hover:scale-125 transition-transform flex justify-center items-center jelly-btn">×</button>
         </div>
     </div>
 

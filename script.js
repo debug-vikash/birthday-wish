@@ -776,9 +776,7 @@ if (viewerBody) {
         });
     }
 
-    closeFrameBtn.addEventListener('click', () => {
-        photoFramePopup.classList.add('hidden');
-    });
+    // removed closeFrameBtn listener because the button was removed and dialog auto-hides
 
     // Start Ultra Attractive Slideshow
     previewBtn.addEventListener('click', () => {
