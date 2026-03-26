@@ -269,3 +269,75 @@
 .magic-btn-hover:hover {
     box-shadow: 0 0 40px rgba(255, 255, 255, 0.8), 0 0 80px rgba(255, 153, 204, 0.6) !important;
 }
+
+/* ======== CINEMATIC & EMOTIONAL UPGRADES ======== */
+.vignette-overlay {
+    background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.4) 110%);
+    mix-blend-mode: multiply;
+}
+
+.ambient-light {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 60%);
+    animation: ambientShift 12s ease-in-out infinite alternate;
+}
+@keyframes ambientShift {
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.2) translate(5%, 5%); }
+}
+
+.cinematic-enter {
+    animation: cinematicFadeScale 4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+}
+@keyframes cinematicFadeScale {
+    0% { opacity: 0; transform: scale(0.8) translateY(30px); filter: blur(15px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
+}
+
+.bg-slow {
+    animation-duration: 30s !important;
+}
+
+.parallax-el {
+    will-change: transform;
+    transition: transform 0.1s ease-out;
+}
+
+.spotlight-shadow {
+    box-shadow: 0 0 80px rgba(255, 255, 255, 0.4), 0 0 150px rgba(255, 153, 204, 0.5) !important;
+}
+
+/* Dynamic Curved Slideshow Motion */
+.slide-curve-1 {
+    animation: curveMotion1 6.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes curveMotion1 {
+    0% { opacity: 0; transform: translate(-30vw, 30vh) scale(0.6) rotate(-15deg); filter: blur(10px); }
+    20% { opacity: 1; filter: blur(0px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    80% { opacity: 1; filter: blur(0px); }
+    100% { opacity: 0; transform: translate(15vw, -10vh) scale(1.15) rotate(5deg); filter: blur(5px); }
+}
+
+.slide-curve-2 {
+    animation: curveMotion2 6.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes curveMotion2 {
+    0% { opacity: 0; transform: translate(30vw, 20vh) scale(0.6) rotate(15deg); filter: blur(10px); }
+    20% { opacity: 1; filter: blur(0px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    80% { opacity: 1; filter: blur(0px); }
+    100% { opacity: 0; transform: translate(-15vw, -15vh) scale(1.15) rotate(-5deg); filter: blur(5px); }
+}
+
+.slide-curve-3 {
+    animation: curveMotion3 6.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes curveMotion3 {
+    0% { opacity: 0; transform: translate(0vw, -30vh) scale(0.6) rotate(-5deg); filter: blur(10px); }
+    20% { opacity: 1; filter: blur(0px); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    80% { opacity: 1; filter: blur(0px); }
+    100% { opacity: 0; transform: translate(5vw, 20vh) scale(1.15) rotate(10deg); filter: blur(5px); }
+}

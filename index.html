@@ -37,6 +37,16 @@
 </head>
 
 <body class="bg-mesh font-body text-on-surface min-h-[100dvh] w-full relative overflow-x-hidden overflow-y-auto">
+    <!-- Auth Profile Menu -->
+    <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-[100] glass-card px-4 py-2 sm:px-5 sm:py-2.5 rounded-full border border-white/60 flex items-center gap-3 shadow-lg fade-in-up">
+        <span class="material-symbols-outlined text-primary text-xl sm:text-2xl drop-shadow-sm">account_circle</span>
+        <span id="user-email" class="font-bold text-xs sm:text-sm text-gray-800 hidden sm:inline max-w-[150px] truncate">...</span>
+        <div class="w-px h-6 bg-primary/20 hidden sm:block"></div>
+        <button id="logout-btn" class="text-[10px] sm:text-xs font-bold bg-white/70 hover:bg-white text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all shadow-sm jelly-btn uppercase tracking-widest border border-primary/10">
+            Logout
+        </button>
+    </div>
+
     <!-- Animated background particles will be injected by JS/CSS here -->
     <div id="particles-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 

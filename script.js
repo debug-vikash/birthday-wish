@@ -8,6 +8,104 @@ if (typeof window.supabase !== 'undefined') {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
+// ====== AUTHENTICATION & ROUTING ======
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!supabaseClient) return;
+    
+    const path = window.location.pathname;
+    const isLogin = path.includes('login.html');
+    const isRegister = path.includes('register.html');
+    const isView = path.includes('view.html');
+    const isCreator = !isLogin && !isRegister && !isView;
+
+    if (isView) return; // Viewers don't require session
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (isCreator) {
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        window.currentUserId = session.user.id;
+        
+        const userEmailSpan = document.getElementById('user-email');
+        if (userEmailSpan) userEmailSpan.innerText = session.user.email;
+        
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'login.html';
+            });
+        }
+    } else if (isLogin || isRegister) {
+        if (session) {
+            window.location.href = 'index.html'; // Already logged in
+            return;
+        }
+    }
+});
+
+// Auth Form Handlers
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const btn = document.getElementById('login-btn');
+        const spinner = document.getElementById('login-spinner');
+        const errorDiv = document.getElementById('login-error');
+        
+        btn.disabled = true;
+        spinner.classList.remove('hidden');
+        errorDiv.classList.add('hidden');
+        
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        
+        if (error) {
+            errorDiv.innerText = error.message;
+            errorDiv.classList.remove('hidden');
+            btn.disabled = false;
+            spinner.classList.add('hidden');
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+}
+
+const registerForm = document.getElementById('register-form');
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const btn = document.getElementById('register-btn');
+        const spinner = document.getElementById('register-spinner');
+        const errorDiv = document.getElementById('register-error');
+        
+        btn.disabled = true;
+        spinner.classList.remove('hidden');
+        errorDiv.classList.add('hidden');
+        
+        const { error } = await supabaseClient.auth.signUp({ 
+            email, password, options: { data: { full_name: name } }
+        });
+        
+        if (error) {
+            errorDiv.innerText = error.message;
+            errorDiv.classList.remove('hidden');
+            btn.disabled = false;
+            spinner.classList.add('hidden');
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+}
+
 // Utilities
 const SHAPES = ['shape-blob', 'shape-tilted-polygon', 'shape-soft-wave', 'shape-asymmetric', 'shape-broken-heart'];
 const DIRECTIONS = ['slide-enter-left', 'slide-enter-right', 'slide-enter-top', 'slide-enter-bottom'];
@@ -447,6 +545,9 @@ if (creatorForm) {
                 if (loadingText) loadingText.innerText = "Creating surprise link...";
                 if (progressBar) progressBar.style.width = '95%';
 
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) throw new Error("You must be logged in to create a surprise!");
+
                 // 3. Insert Database Record
                 const { data: dbData, error: dbError } = await supabaseClient
                     .from('surprises')
@@ -457,7 +558,8 @@ if (creatorForm) {
                         photo_urls: photoUrls,
                         music_url: musicUrl,
                         music_start_time: Number(trimStart.value) || null,
-                        music_end_time: Number(trimEnd.value) || null
+                        music_end_time: Number(trimEnd.value) || null,
+                        user_id: session.user.id
                     }])
                     .select();
 
@@ -566,6 +668,25 @@ if (viewerBody) {
     let loadedMessage = "";
     let musicStartTime = 0;
     let musicEndTime = null;
+
+    function initParallax() {
+        if (heartsContainer) heartsContainer.style.transition = 'transform 0.2s ease-out';
+        const pContainer = document.getElementById('particles-container');
+        if (pContainer) pContainer.style.transition = 'transform 0.2s ease-out';
+        if (experienceDiv) experienceDiv.style.transition = 'transform 0.2s ease-out';
+
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth < 768) return; // Disable complex parallax on small mobile to save battery
+            const x = (e.clientX / window.innerWidth - 0.5) * 40;
+            const y = (e.clientY / window.innerHeight - 0.5) * 40;
+            
+            requestAnimationFrame(() => {
+                if (heartsContainer) heartsContainer.style.transform = `translate(${x}px, ${y}px)`;
+                if (pContainer) pContainer.style.transform = `translate(${x * -0.5}px, ${y * -0.5}px)`;
+                if (experienceDiv) experienceDiv.style.transform = `translate(${x * 0.5}px, ${y * 0.5}px)`;
+            });
+        });
+    }
 
     // Safely and Softly Fade in Audio 
     function fadeAudioIn(audio, targetVolume = 0.4, step = 0.05, interval = 100) {
@@ -677,7 +798,14 @@ if (viewerBody) {
             loader.classList.add('hidden');
             experienceDiv.classList.remove('hidden');
 
+            // Cinematic Text Reveal
+            setTimeout(() => {
+                const introTitle = document.getElementById('intro-title-group');
+                if (introTitle) introTitle.classList.add('cinematic-enter');
+            }, 600);
+
             startHearts();
+            initParallax();
             
         } catch (error) {
             console.error(error);
@@ -697,6 +825,9 @@ if (viewerBody) {
 
         if(loadedPhotos.length === 0) return;
         
+        const isMobile = window.innerWidth < 768;
+        const spawnRate = isMobile ? 3500 : 2000;
+
         setInterval(() => {
             const heart = document.createElement('div');
             heart.className = 'heart-particle';
@@ -752,7 +883,7 @@ if (viewerBody) {
             
             heartsContainer.appendChild(heart);
             setTimeout(() => { heart.remove(); }, duration * 1000);
-        }, 2000);   // Throttle spawn a heart every 2s instead of 1.2s
+        }, spawnRate);
     }
     
     // Sparkle burst on Start The Magic button hover
@@ -807,6 +938,7 @@ if (viewerBody) {
         slideshowContainer.innerHTML = '';
         slideshowOverlay.classList.add('hidden'); // Clear overlay so interaction is possible
         finalScreen.classList.remove('hidden');
+        document.body.classList.add('bg-slow'); // Slow down gradient for emotional scene
         
         // Automatically re-enable scrolling so user can scroll down and read custom message fully
         document.body.style.overflow = ''; 
@@ -844,12 +976,12 @@ if (viewerBody) {
             const img = document.createElement('img');
             img.src = url;
             
-            // Random styling for each slide
-            const randomDirection = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+            // Dynamic Curved Motion for Cinematic Slideshow
+            const curveClasses = ['slide-curve-1', 'slide-curve-2', 'slide-curve-3'];
+            const randomCurve = curveClasses[Math.floor(Math.random() * curveClasses.length)];
             const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
             
-            // Removed float-rotate-anim because it overwrites the slideIn opacity keyframes, causing invisible slides
-            img.className = `slide-ultra ${randomDirection} ${randomShape}`;
+            img.className = `slide-ultra ${randomCurve} ${randomShape}`;
             
             // Sparkle Particle Burst on entry (Center of screen approx)
             setTimeout(() => {
@@ -866,15 +998,15 @@ if (viewerBody) {
 
             slideshowContainer.appendChild(img);
             
-            // Each fully animated slide takes about 4.5s of pacing before next starts overlapping
+            // Cinematic pacing: overlapping slides smoothly
             setTimeout(() => {
                 resolve();
-            }, 4000); 
+            }, 3500); 
 
-            // Clean up DOM later when animation finishes (CSS slideZoom is 8s)
+            // Clean up DOM later when animation finishes
             setTimeout(() => {
                 img.remove();
-            }, 9000);
+            }, 7000);
         });
     }
 
