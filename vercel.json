@@ -17,6 +17,14 @@
     {
       "src": "view.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "login.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "register.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
