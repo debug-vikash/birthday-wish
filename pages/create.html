@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Surprise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff8fa3',
+                        'primary-dark': '#ff6f91',
+                        'secondary-pastel': '#f6c1c7',
+                    },
+                    fontFamily: {
+                        'headline': ['"Playfair Display"', 'serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/create.css">
+
+    <style>
+        *, *::before, *::after { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body {
+            background: #faf3ee;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(255,143,163,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(246,193,199,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(255,228,225,0.1) 0%, transparent 40%);
+            font-family: 'Inter', sans-serif;
+            color: #4a3f35;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+        .paper-card {
+            background: #fffcf9;
+            border: 1px solid #f0e4d7;
+            box-shadow: 0 1px 3px rgba(74,63,53,0.04), 0 8px 30px rgba(74,63,53,0.06), inset 0 0 0 1px rgba(255,255,255,0.8);
+        }
+        .sketch-input {
+            background: rgba(255,252,249,0.7);
+            border: 1.5px solid #e8d8ca;
+            border-radius: 14px;
+            transition: all 0.25s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+        }
+        .sketch-input:focus {
+            border-color: #ff8fa3;
+            background: #fffcf9;
+            box-shadow: 0 0 0 3px rgba(255,143,163,0.1);
+            outline: none;
+        }
+        .craft-btn {
+            background: #ff6f91;
+            border: 2px solid #ff5a7d;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .craft-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,111,145,0.25); }
+        .craft-btn:active { transform: translateY(0) scale(0.98); }
+        .section-label {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #4a3f35;
+        }
+        .helper-text {
+            font-size: 0.75rem;
+            color: #8a7e72;
+            font-style: italic;
+        }
+        .hand-divider {
+            height: 1px;
+            background: #f0e4d7;
+        }
+        .photo-pile {
+            background: linear-gradient(135deg, #fffcf9, #f8f0e8);
+            border: 2px dashed #e0d0c0;
+            border-radius: 18px;
+        }
+        .photo-pile:hover { border-color: #ff8fa3; background: linear-gradient(135deg, #fff8f5, #fef0ea); }
+        .sticky-note {
+            background: linear-gradient(135deg, #fff8e8, #fff3d8);
+            border: 1px solid #f0e4c8;
+            box-shadow: 2px 3px 8px rgba(0,0,0,0.04);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen relative pb-10 overflow-x-hidden">
+
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Navigation -->
+    <nav class="relative z-50 px-5 py-5 flex justify-between items-center max-w-2xl mx-auto">
+        <a href="dashboard.html" class="flex items-center gap-1.5 text-[#8a7e72] hover:text-primary transition-all text-sm group">
+            <ion-icon name="arrow-back-outline" class="group-hover:-translate-x-1 transition-transform"></ion-icon>
+            <span>Back to Dashboard</span>
+        </a>
+        <span id="user-email" class="hidden text-xs text-[#8a7e72] bg-[#f5ece3] px-3 py-1 rounded-full"></span>
+    </nav>
+
+    <main class="relative z-10 max-w-lg mx-auto px-5 pt-4 pb-20">
+
+        <!-- Page Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-headline font-bold text-[#4a3f35] leading-tight" style="letter-spacing:-0.02em;">
+                Create a Surprise
+            </h1>
+            <p class="text-[#8a7e72] text-sm mt-2">Fill in the details — every touch makes it more personal.</p>
+        </div>
+
+        <!-- Form -->
+        <form id="creator-form" class="paper-card rounded-[22px] p-6 sm:p-8 space-y-6">
+
+            <!-- Recipient Name -->
+            <div>
+                <label class="section-label block mb-2">Recipient's Name</label>
+                <input type="text" id="name" required placeholder="Who is this for?"
+                    class="sketch-input w-full py-3.5 px-4">
+            </div>
+
+            <div class="hand-divider"></div>
+
+            <!-- Occasion -->
+            <div>
+                <label class="section-label block mb-2">Occasion</label>
+                <div class="relative">
+                    <select id="occasion"
+                        class="sketch-input w-full py-3.5 px-4 appearance-none pr-10 cursor-pointer">
+                        <option value="Birthday" selected>Birthday 🎂</option>
+                        <option value="Anniversary">Anniversary 🥂</option>
+                        <option value="Valentine">Valentine's Day 💝</option>
+                        <option value="Proposal">Wedding / Proposal 💍</option>
+                        <option value="Just Because">Just Because ✨</option>
+                        <option value="Custom">Something else...</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#8a7e72] pointer-events-none text-lg">expand_more</span>
+                </div>
+            </div>
+
+            <div id="custom-occasion-container" class="hidden">
+                <label class="section-label block mb-2">Custom Event Name</label>
+                <input type="text" id="custom-occasion" placeholder="Graduation, Promotion..."
+                    class="sketch-input w-full py-3 px-4">
+            </div>
+
+            <div class="hand-divider"></div>
+
+            <!-- Photos -->
+            <div>
+                <div class="flex justify-between items-baseline mb-2">
+                    <label class="section-label">Photos</label>
+                    <span class="helper-text">up to 10 recommended</span>
+                </div>
+
+                <div class="photo-pile relative p-8 text-center cursor-pointer transition-all group">
+                    <input type="file" id="photos" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-20">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="material-symbols-outlined text-3xl text-[#8a7e72]/40 group-hover:text-primary group-hover:scale-110 transition-all">add_photo_alternate</span>
+                        <p class="text-sm text-[#8a7e72] group-hover:text-[#4a3f35] transition-colors">Tap to add your best photos</p>
+                        <p class="text-[10px] text-[#8a7e72]/50">JPG, PNG, WebP</p>
+                    </div>
+                </div>
+
+                <div id="photo-gallery" class="grid grid-cols-4 sm:grid-cols-5 gap-2.5 mt-4"></div>
+            </div>
+
+            <div class="hand-divider"></div>
+
+            <!-- Music -->
+            <div class="sticky-note rounded-[16px] p-5">
+                <div class="flex items-center gap-2 mb-2">
+                    <label class="section-label">Soundtrack</label>
+                </div>
+                <p class="helper-text mb-3">Optional — music makes the surprise more emotional.</p>
+
+                <div class="relative">
+                    <input type="file" id="music" accept="audio/*" class="absolute inset-0 opacity-0 cursor-pointer z-20">
+                    <div class="sketch-input w-full py-3 px-4 flex items-center gap-3 cursor-pointer hover:border-primary transition-all">
+                        <span class="material-symbols-outlined text-primary/60 text-xl">upload_file</span>
+                        <div>
+                            <p id="music-filename" class="text-sm text-[#4a3f35]/70 font-medium">Tap to select audio</p>
+                            <p class="text-[10px] text-[#8a7e72]/50">MP3, WAV, AAC</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="music-trim-container" class="hidden space-y-4 pt-4">
+                    <p class="section-label text-base">Trim the best part</p>
+                    <div class="relative h-10 bg-[#f5ece3] rounded-lg overflow-hidden border border-[#ede3d8]">
+                        <div id="trim-range-highlight" class="absolute h-full bg-primary/15 border-x border-primary/30 z-10 transition-all"></div>
+                        <input type="range" id="trim-start" class="absolute inset-0 w-full opacity-0 z-30 cursor-pointer" step="0.5">
+                        <input type="range" id="trim-end" class="absolute inset-0 w-full opacity-0 z-30 cursor-pointer" step="0.5">
+                        <div id="thumb-start" class="absolute top-0 w-0.5 h-full bg-primary z-40 flex items-center justify-center pointer-events-none">
+                            <div class="w-4 h-4 bg-white border-2 border-primary rounded-full shadow-sm"></div>
+                        </div>
+                        <div id="thumb-end" class="absolute top-0 w-0.5 h-full bg-primary-dark z-40 flex items-center justify-center pointer-events-none">
+                            <div class="w-4 h-4 bg-white border-2 border-primary-dark rounded-full shadow-sm"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <div class="flex gap-1.5 items-center text-sm">
+                            <span id="trim-start-display" class="text-primary font-semibold">0:00</span>
+                            <span class="text-[#8a7e72]">→</span>
+                            <span id="trim-end-display" class="text-primary-dark font-semibold">0:12</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="trim-duration-display" class="text-[10px] font-semibold bg-[#f5ece3] px-2.5 py-1 rounded-full text-[#8a7e72]">12s</span>
+                            <button type="button" id="preview-trim-btn" class="w-8 h-8 bg-primary-dark text-white rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all">
+                                <ion-icon id="preview-trim-icon" name="play" class="text-base"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+                    <audio id="hidden-audio-player" class="hidden"></audio>
+                </div>
+            </div>
+
+            <div class="hand-divider"></div>
+
+            <!-- Message -->
+            <div>
+                <label class="section-label block mb-2">Your Heartfelt Wish</label>
+                <p class="helper-text mb-3">This will be revealed at the end of the surprise.</p>
+                <textarea id="message" required
+                    placeholder="Dear [name], I just wanted you to know..."
+                    class="sketch-input w-full py-4 px-4 min-h-[140px] resize-none leading-relaxed"></textarea>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" id="submit-btn"
+                class="craft-btn shimmer-btn w-full text-white font-semibold py-5 mt-4 flex items-center justify-center gap-2 text-sm tracking-wide shadow-lg group">
+                <span>Create the Magic Link</span>
+                <ion-icon name="rocket" class="group-hover:rotate-12 transition-transform"></ion-icon>
+            </button>
+        </form>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-[#faf3ee]/95 backdrop-blur-sm">
+            <div class="text-center space-y-6 max-w-xs">
+                <div class="spinner-magical mx-auto"></div>
+                <h3 class="text-2xl font-headline font-bold text-[#4a3f35]">Crafting your surprise...</h3>
+                <p id="loading-text" class="text-[#8a7e72] text-sm animate-pulse">Syncing memories and music</p>
+                <div class="w-full h-2 bg-[#f5ece3] rounded-full overflow-hidden mt-4">
+                    <div id="upload-progress-bar" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 5%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Popup -->
+        <div id="success-popup" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-[#faf3ee]/95 backdrop-blur-sm p-6">
+            <div class="max-w-md w-full text-center paper-card rounded-[22px] p-8 relative">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-3xl font-headline font-bold text-[#4a3f35] mb-2">It's Ready!</h2>
+                <p class="text-[#8a7e72] text-sm mb-6">Your surprise link has been created and is ready to share.</p>
+
+                <div class="flex bg-[#f5ece3] p-2 rounded-xl border border-[#ede3d8]">
+                    <input type="text" id="share-link" readonly class="flex-1 bg-transparent px-3 py-2 text-primary text-sm font-medium truncate outline-none">
+                    <button id="copy-btn" class="bg-primary text-white font-semibold px-5 py-2 rounded-lg shadow-sm hover:shadow active:scale-95 transition-all text-sm">
+                        Copy Link
+                    </button>
+                </div>
+
+                <div class="pt-6 flex flex-col gap-3">
+                    <a href="dashboard.html" class="text-[#8a7e72] text-sm hover:text-primary transition-all">Back to Dashboard</a>
+                    <button id="create-another-btn" class="craft-btn text-white py-3 font-semibold text-sm">Create Another</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/create.js"></script>
+</body>
+</html>

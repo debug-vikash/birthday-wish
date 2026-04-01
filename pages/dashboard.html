@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Surprises — Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff8fa3',
+                        'primary-dark': '#ff6f91',
+                        'secondary-pastel': '#f6c1c7',
+                    },
+                    fontFamily: {
+                        'headline': ['"Playfair Display"', 'serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+
+    <style>
+        *, *::before, *::after { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body {
+            background: #faf3ee;
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(255,143,163,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(246,193,199,0.07) 0%, transparent 50%);
+            font-family: 'Inter', sans-serif;
+            color: #4a3f35;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+        .paper-card {
+            background: #fffcf9;
+            border: 1px solid #f0e4d7;
+            box-shadow: 0 1px 3px rgba(74,63,53,0.04), 0 8px 30px rgba(74,63,53,0.06), inset 0 0 0 1px rgba(255,255,255,0.8);
+        }
+        .craft-btn {
+            background: #ff6f91;
+            border: 2px solid #ff5a7d;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .craft-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,111,145,0.25); }
+        .craft-btn:active { transform: translateY(0) scale(0.98); }
+
+        /* Delete modal */
+        .modal-backdrop {
+            background: rgba(74,63,53,0.3);
+            backdrop-filter: blur(8px);
+        }
+        .modal-card {
+            background: #fffcf9;
+            border: 1px solid #f0e4d7;
+            box-shadow: 0 20px 60px rgba(74,63,53,0.15);
+        }
+        .btn-cancel {
+            background: #f5ece3;
+            border: 1px solid #ede3d8;
+            color: #8a7e72;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+        .btn-cancel:hover { background: #ede3d8; }
+        .btn-delete {
+            background: #e74c5e;
+            border: 1px solid #d4394b;
+            color: white;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+        .btn-delete:hover { background: #d4394b; }
+        .btn-delete:active { transform: scale(0.97); }
+        .btn-delete:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Toast */
+        .toast {
+            background: #4a3f35;
+            color: #fffcf9;
+            box-shadow: 0 8px 30px rgba(74,63,53,0.2);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20 overflow-x-hidden">
+
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Navigation -->
+    <nav class="relative z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-[#fff3ec] rounded-xl flex items-center justify-center border border-[#f0e4d7] shadow-sm animate-pulse-gentle">
+                <ion-icon name="sparkles" class="text-xl text-primary"></ion-icon>
+            </div>
+            <h1 class="text-2xl font-headline font-bold text-[#4a3f35]" style="letter-spacing:-0.02em;">Surprise Link</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="user-email" class="hidden text-xs text-[#8a7e72] bg-[#f5ece3] px-3 py-1.5 rounded-full border border-[#ede3d8]"></span>
+            <button id="logout-btn" class="text-[#8a7e72] hover:text-red-400 transition-colors">
+                <ion-icon name="log-out-outline" class="text-2xl"></ion-icon>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto px-6 pt-8">
+        <header class="mb-12 space-y-2 fade-in-up">
+            <h2 class="text-4xl md:text-5xl font-headline font-bold text-[#4a3f35]" style="letter-spacing:-0.02em;">My Surprises</h2>
+            <p class="text-[#8a7e72] text-sm">Manage your creations and share the joy.</p>
+        </header>
+
+        <div id="dashboard-loading" class="flex flex-col items-center justify-center py-20 gap-4 opacity-100 transition-opacity">
+            <div class="spinner-magical"></div>
+            <p class="text-sm text-primary animate-pulse font-medium">Fetching your surprises...</p>
+        </div>
+
+        <div id="dashboard-empty" class="hidden flex flex-col items-center justify-center py-20 text-center paper-card rounded-[24px] scale-up">
+            <div class="w-20 h-20 bg-[#fff3ec] rounded-full flex items-center justify-center mb-6">
+                <ion-icon name="gift-outline" class="text-4xl text-primary opacity-40"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-headline font-bold text-[#4a3f35] mb-2">No surprises yet</h3>
+            <p class="text-[#8a7e72] mb-8 max-w-xs mx-auto text-sm">Start by creating your first magical surprise link.</p>
+            <a href="create.html" class="craft-btn text-white px-8 py-4 font-semibold text-sm flex items-center gap-2">
+                <ion-icon name="add-circle"></ion-icon>
+                Create First Surprise
+            </a>
+        </div>
+
+        <div id="surprises-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <!-- Mobile FAB -->
+    <a href="create.html" class="fixed bottom-8 right-8 z-50 w-14 h-14 craft-btn text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all lg:hidden">
+        <ion-icon name="add" class="text-2xl"></ion-icon>
+    </a>
+
+    <!-- Desktop Create Prompt -->
+    <div class="hidden lg:flex fixed bottom-8 left-1/2 -translate-x-1/2 z-50 scale-up">
+        <a href="create.html" class="paper-card py-4 px-8 rounded-full flex items-center gap-4 group hover:border-primary/30 transition-all">
+            <div class="w-10 h-10 craft-btn text-white rounded-full flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform">
+                <ion-icon name="color-wand" class="text-lg"></ion-icon>
+            </div>
+            <span class="font-semibold text-[#4a3f35] text-sm">Craft a new surprise</span>
+            <ion-icon name="arrow-forward" class="text-primary group-hover:translate-x-1 transition-transform"></ion-icon>
+        </a>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 z-[100] modal-backdrop flex items-center justify-center p-6">
+        <div class="modal-card rounded-[20px] p-8 max-w-sm w-full text-center space-y-5">
+            <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+                <ion-icon name="trash-outline" class="text-2xl text-red-400"></ion-icon>
+            </div>
+            <h3 class="font-headline font-bold text-xl text-[#4a3f35]">Delete this surprise?</h3>
+            <p class="text-[#8a7e72] text-sm">This will permanently remove the surprise, including all photos and music. This cannot be undone.</p>
+            <div class="flex gap-3 pt-2">
+                <button onclick="hideDeleteModal()" class="btn-cancel flex-1 py-3 font-semibold text-sm">Cancel</button>
+                <button id="confirm-delete-btn" onclick="confirmDelete()" class="btn-delete flex-1 py-3 font-semibold text-sm">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-[110] toast px-6 py-3 rounded-full text-sm font-medium opacity-0 translate-y-4 transition-all"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

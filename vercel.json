@@ -1,36 +1,25 @@
 {
   "version": 2,
   "name": "birthday-wish",
-  "builds": [
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "style.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "script.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "view.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "login.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "register.html",
-      "use": "@vercel/static"
-    }
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/", "destination": "/pages/index.html" },
+    { "source": "/login", "destination": "/pages/index.html" },
+    { "source": "/register", "destination": "/pages/index.html" },
+    { "source": "/dashboard", "destination": "/pages/dashboard.html" },
+    { "source": "/create", "destination": "/pages/create.html" },
+    { "source": "/view", "destination": "/pages/view.html" },
+    { "source": "/pages/:path*", "destination": "/pages/:path*" }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/css/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/js/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
   ]
 }

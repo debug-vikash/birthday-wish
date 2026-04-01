@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Link — welcome back ♡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff8fa3',
+                        'primary-dark': '#ff6f91',
+                        'secondary-pastel': '#f6c1c7',
+                    },
+                    fontFamily: {
+                        'headline': ['"Playfair Display"', 'serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="../css/common.css">
+
+    <style>
+        *, *::before, *::after { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body {
+            background: #faf3ee;
+            background-image:
+                radial-gradient(ellipse at 25% 40%, rgba(255,143,163,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 60%, rgba(246,193,199,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(255,228,225,0.1) 0%, transparent 40%);
+            font-family: 'Inter', sans-serif;
+            color: #4a3f35;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+        .paper-card {
+            background: #fffcf9;
+            border: 1px solid #f0e4d7;
+            box-shadow: 0 1px 3px rgba(74,63,53,0.04), 0 8px 30px rgba(74,63,53,0.06), inset 0 0 0 1px rgba(255,255,255,0.8);
+        }
+        .sketch-input {
+            background: rgba(255,252,249,0.7);
+            border: 1.5px solid #e8d8ca;
+            border-radius: 14px;
+            transition: all 0.25s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+        }
+        .sketch-input:focus {
+            border-color: #ff8fa3;
+            background: #fffcf9;
+            box-shadow: 0 0 0 3px rgba(255,143,163,0.1);
+            outline: none;
+        }
+        .craft-btn {
+            background: #ff6f91;
+            border: 2px solid #ff5a7d;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .craft-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,111,145,0.25); }
+        .craft-btn:active { transform: translateY(0) scale(0.98); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-x-hidden">
+
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <div class="relative z-10 w-full max-w-md scale-up">
+        
+        <!-- Logo/Header -->
+        <div class="text-center mb-8 fade-in-up">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-[#fff3ec] rounded-2xl border border-[#f0e4d7] mb-4 shadow-sm animate-pulse-gentle">
+                <ion-icon name="sparkles" class="text-2xl text-primary"></ion-icon>
+            </div>
+            <h1 class="text-4xl font-headline font-bold text-[#4a3f35] tracking-tight" style="letter-spacing:-0.02em;">Surprise Link</h1>
+            <p class="text-[#8a7e72] mt-2 text-sm">handcrafted memories since 2026</p>
+        </div>
+
+        <!-- Auth Card -->
+        <div class="paper-card rounded-[24px] p-7 sm:p-8 overflow-hidden relative">
+
+            <!-- Tabs Toggle -->
+            <div class="flex p-1 bg-[#f5ece3] rounded-2xl mb-7 border border-[#ede3d8]">
+                <button id="tab-login" class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-[#fffcf9] text-primary shadow-sm">Login</button>
+                <button id="tab-register" class="flex-1 py-3 rounded-xl font-semibold text-sm transition-all duration-300 text-[#8a7e72] hover:text-primary">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-section" class="space-y-5">
+                <form id="login-form" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-headline font-semibold text-[#4a3f35] ml-1">Email Address</label>
+                        <div class="relative">
+                            <ion-icon name="mail-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50"></ion-icon>
+                            <input type="email" id="login-email" required placeholder="name@example.com" class="sketch-input w-full py-3.5 pl-11 pr-4 text-[#4a3f35] placeholder-[#8a7e72]/40">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-headline font-semibold text-[#4a3f35] ml-1">Password</label>
+                        <div class="relative">
+                            <ion-icon name="lock-closed-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50"></ion-icon>
+                            <input type="password" id="login-password" required placeholder="••••••••" class="sketch-input w-full py-3.5 pl-11 pr-4 text-[#4a3f35] placeholder-[#8a7e72]/40">
+                        </div>
+                    </div>
+                    <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-medium animate-pulse"></div>
+                    <button type="submit" id="login-btn" class="craft-btn shimmer-btn w-full text-white font-semibold py-4 flex items-center justify-center gap-2 text-sm tracking-wide">
+                        <span id="login-spinner" class="hidden spinner-pulse w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        Enter My Dashboard
+                    </button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-section" class="hidden space-y-5">
+                <form id="register-form" class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-headline font-semibold text-[#4a3f35] ml-1">Full Name</label>
+                        <div class="relative">
+                            <ion-icon name="person-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50"></ion-icon>
+                            <input type="text" id="register-name" required placeholder="Your name" class="sketch-input w-full py-3.5 pl-11 pr-4 text-[#4a3f35] placeholder-[#8a7e72]/40">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-headline font-semibold text-[#4a3f35] ml-1">Email Address</label>
+                        <div class="relative">
+                            <ion-icon name="mail-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50"></ion-icon>
+                            <input type="email" id="register-email" required placeholder="name@example.com" class="sketch-input w-full py-3.5 pl-11 pr-4 text-[#4a3f35] placeholder-[#8a7e72]/40">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-headline font-semibold text-[#4a3f35] ml-1">Password</label>
+                        <div class="relative">
+                            <ion-icon name="lock-closed-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50"></ion-icon>
+                            <input type="password" id="register-password" required placeholder="••••••••" class="sketch-input w-full py-3.5 pl-11 pr-4 text-[#4a3f35] placeholder-[#8a7e72]/40">
+                        </div>
+                    </div>
+                    <div id="register-error" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-medium animate-pulse"></div>
+                    <button type="submit" id="register-btn" class="craft-btn shimmer-btn w-full text-white font-semibold py-4 flex items-center justify-center gap-2 text-sm tracking-wide">
+                        <span id="register-spinner" class="hidden spinner-pulse w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        Create My Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <p class="text-center mt-6 text-[#8a7e72]/50 text-xs">Safe & Secure · Supabase Auth</p>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+        const loginSection = document.getElementById('login-section');
+        const registerSection = document.getElementById('register-section');
+
+        function showLogin() {
+            tabLogin.classList.add('bg-white', 'text-primary', 'shadow-sm');
+            tabLogin.classList.remove('text-[#3e3e3e]/60');
+            tabRegister.classList.remove('bg-white', 'text-primary', 'shadow-sm');
+            tabRegister.classList.add('text-[#3e3e3e]/60');
+            loginSection.classList.remove('hidden');
+            registerSection.classList.add('hidden');
+        }
+
+        function showRegister() {
+            tabRegister.classList.add('bg-white', 'text-primary', 'shadow-sm');
+            tabRegister.classList.remove('text-[#3e3e3e]/60');
+            tabLogin.classList.remove('bg-white', 'text-primary', 'shadow-sm');
+            tabLogin.classList.add('text-[#3e3e3e]/60');
+            registerSection.classList.remove('hidden');
+            loginSection.classList.add('hidden');
+        }
+
+        tabLogin.addEventListener('click', showLogin);
+        tabRegister.addEventListener('click', showRegister);
+    </script>
+</body>
+</html>

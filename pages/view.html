@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Special Surprise For You ♡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff8fa3',
+                        'primary-dark': '#ff6f91',
+                        'secondary-pastel': '#f6c1c7',
+                    },
+                    fontFamily: {
+                        'headline': ['"Playfair Display"', 'serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/view.css">
+
+    <style>
+        *, *::before, *::after { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body {
+            background: #faf3ee;
+            background-image:
+                radial-gradient(ellipse at 30% 20%, rgba(255,143,163,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(246,193,199,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255,228,225,0.1) 0%, transparent 40%);
+            font-family: 'Inter', sans-serif;
+            color: #4a3f35;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+        .paper-card {
+            background: #fffcf9;
+            border: 1px solid #f0e4d7;
+            box-shadow: 0 1px 3px rgba(74,63,53,0.04), 0 8px 30px rgba(74,63,53,0.06), inset 0 0 0 1px rgba(255,255,255,0.8);
+        }
+        .craft-btn {
+            background: #ff6f91;
+            border: 2px solid #ff5a7d;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .craft-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,111,145,0.25); }
+        .craft-btn:active { transform: translateY(0) scale(0.98); }
+        .warm-loader {
+            background: #faf3ee;
+            background-image: radial-gradient(ellipse at 50% 50%, rgba(255,143,163,0.05) 0%, transparent 50%);
+        }
+        .warm-overlay {
+            background: rgba(250,243,238,0.7);
+            backdrop-filter: blur(20px);
+        }
+        .warm-vignette {
+            background: radial-gradient(circle at center, transparent 40%, rgba(74,63,53,0.06) 110%);
+        }
+        .warm-ambient {
+            background: radial-gradient(circle at 50% 50%, rgba(255,200,180,0.06) 0%, transparent 60%);
+        }
+    </style>
+</head>
+<body class="viewer-body min-h-screen relative overflow-hidden select-none">
+
+    <!-- Cinematic Overlays -->
+    <div class="fixed inset-0 z-[1] warm-vignette vignette-overlay pointer-events-none"></div>
+    <div class="fixed inset-0 z-[0] warm-ambient ambient-light pointer-events-none"></div>
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-[1]"></div>
+
+    <!-- Loader -->
+    <div id="loader" class="fixed inset-0 z-[100] warm-loader flex flex-col items-center justify-center p-8 text-center">
+        <div class="spinner-magical mb-8"></div>
+        <h3 class="text-2xl font-headline font-bold text-[#4a3f35] animate-pulse" style="letter-spacing:-0.02em;">Opening your surprise...</h3>
+    </div>
+
+    <!-- Error Screen -->
+    <div id="error-screen" class="hidden fixed inset-0 z-[90] warm-loader flex flex-col items-center justify-center p-8 text-center">
+        <div class="w-20 h-20 bg-[#fff3ec] rounded-full flex items-center justify-center mb-6">
+            <ion-icon name="alert-circle-outline" class="text-5xl text-primary opacity-40"></ion-icon>
+        </div>
+        <h2 class="text-3xl font-headline font-bold text-[#4a3f35] mb-4" style="letter-spacing:-0.02em;">Link Not Found</h2>
+        <p class="text-[#8a7e72] max-w-xs mx-auto mb-8 text-sm">This surprise may have been deleted or the link is incorrect.</p>
+        <a href="index.html" class="craft-btn text-white px-8 py-4 font-semibold text-sm">Go Home</a>
+    </div>
+
+    <!-- Music HUD -->
+    <div id="hud" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-4">
+        <button id="music-btn" class="paper-card p-3 rounded-full hover:scale-105 active:scale-95 transition-all text-[#4a3f35] text-xs flex items-center gap-2 group grow-btn font-medium">
+            <ion-icon name="musical-note" class="text-lg text-primary"></ion-icon>
+            ♪ Play Music
+        </button>
+    </div>
+
+    <!-- Experience -->
+    <div id="experience" class="hidden relative z-10 w-full h-screen flex flex-col items-center justify-center p-6 text-center">
+        <div id="intro-title-group" class="space-y-4 opacity-0">
+            <div class="inline-flex w-16 h-16 bg-[#fff3ec] rounded-2xl items-center justify-center border border-[#f0e4d7] mb-6 shadow-sm spotlight-shadow">
+                <ion-icon name="sparkles" class="text-3xl text-primary animate-pulse-gentle"></ion-icon>
+            </div>
+            <h2 class="text-xs font-semibold tracking-[0.3em] text-primary/70 mb-2 uppercase">A Special Surprise For</h2>
+            <h1 id="bday-name" class="text-5xl md:text-7xl font-headline font-bold text-[#4a3f35] premium-text-glow leading-tight" style="letter-spacing:-0.03em;">Someone Special</h1>
+            <p class="text-base text-[#8a7e72] mt-6 bg-[#fff3ec] px-6 py-2 rounded-full border border-[#f0e4d7] inline-block font-medium">
+                Happy <span id="occasion-text">Birthday</span>! ✨
+            </p>
+        </div>
+
+        <button id="preview-animation-btn" class="shimmer-btn mt-12 craft-btn text-white px-10 py-5 font-headline font-bold text-xl shadow-lg hover:scale-105 active:scale-95 transition-all outline-none magic-btn-hover flex items-center gap-3 group">
+            Start the Magic
+            <ion-icon name="color-wand" class="group-hover:rotate-12 transition-transform text-white/60"></ion-icon>
+        </button>
+
+        <p class="mt-8 text-xs text-[#8a7e72]/50 italic">Tap the floating hearts after starting</p>
+    </div>
+
+    <!-- Slideshow -->
+    <div id="slideshow-overlay" class="hidden fixed inset-0 z-[70] bg-white/10 backdrop-blur-lg flex items-center justify-center p-6 overflow-hidden">
+        <div id="slideshow-image-container" class="relative w-full h-full flex items-center justify-center perspective-1000"></div>
+    </div>
+
+    <!-- Hearts -->
+    <div id="hearts-container" class="fixed inset-0 z-[40] pointer-events-none"></div>
+
+    <!-- Photo Popup -->
+    <div id="photo-frame-popup" class="hidden fixed inset-0 z-[80] flex items-center justify-center pointer-events-none p-10">
+        <div class="paper-card p-3 rounded-[20px] border-[8px] border-[#fffcf9] shadow-[0_30px_60px_rgba(74,63,53,0.12)] transform rotate-2 max-w-sm w-full animate-float min-h-[300px] flex items-center justify-center">
+            <img id="frame-image" src="" class="w-full h-full object-cover rounded-[14px] shadow-inner bg-[#fff3ec]">
+        </div>
+    </div>
+
+    <!-- Final Message -->
+    <div id="final-screen" class="hidden fixed inset-0 z-[90] warm-overlay flex flex-col items-center justify-center p-8 overflow-y-auto">
+        <div id="custom-message-card" class="paper-card rounded-[22px] p-10 md:p-14 max-w-2xl w-full relative text-center space-y-6 animate-message-entrance premium-floating">
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-4 border-[#fffcf9]">
+                <ion-icon name="heart" class="text-3xl"></ion-icon>
+            </div>
+            
+            <h3 class="text-sm font-semibold tracking-[0.2em] text-primary/60 pt-4 uppercase">A Message of Love</h3>
+            <p id="custom-message-text" class="text-2xl md:text-3xl font-headline font-bold text-[#4a3f35] leading-relaxed animate-text-reveal" style="letter-spacing:-0.01em;">
+                Loading your magical wish...
+            </p>
+            
+            <div class="pt-8 flex flex-col md:flex-row items-center justify-center gap-5">
+                <button id="watch-again-btn" class="craft-btn text-white px-8 py-4 font-semibold text-sm shadow-md hover:translate-y-[-3px] active:scale-95 transition-all grow-btn">
+                    Relive the Magic
+                </button>
+                <a href="index.html" class="text-[#8a7e72]/50 hover:text-primary transition-all text-xs font-medium uppercase tracking-widest">Create Your Own</a>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop></audio>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/view.js"></script>
+</body>
+</html>

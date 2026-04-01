@@ -1,0 +1,23 @@
+/* ======== DASHBOARD PAGE SPECIFIC ======== */
+
+#surprises-grid {
+    perspective: 1000px;
+}
+
+.dashboard-card {
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-10px) rotateX(2deg);
+    box-shadow: 0 20px 40px rgba(255, 143, 163, 0.3);
+}
+
+.grow-btn {
+    transition: all 0.3s ease;
+}
+
+.grow-btn:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.9);
+}
