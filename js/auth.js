@@ -6,10 +6,10 @@ async function checkAuth() {
     if (!supabaseClient) return;
 
     const path = window.location.pathname;
-    const isLogin = path.includes('index.html') || path.endsWith('/pages/');
-    const isView = path.includes('view.html');
-    const isCreate = path.includes('create.html');
-    const isDashboard = path.includes('dashboard.html');
+    const isLogin = path.includes('index.html') || path === '/' || path === '/login' || path === '/register' || path.endsWith('/pages/');
+    const isView = path.includes('view.html') || path === '/view';
+    const isCreate = path.includes('create.html') || path === '/create';
+    const isDashboard = path.includes('dashboard.html') || path === '/dashboard';
 
     if (isView) return; // Viewers don't require session
 
@@ -17,7 +17,7 @@ async function checkAuth() {
 
     if (isDashboard || isCreate) {
         if (!session) {
-            window.location.replace('index.html'); // Back to login
+            window.location.replace('/'); // Back to login
             return;
         }
         
@@ -32,12 +32,12 @@ async function checkAuth() {
         if (logoutBtn) {
             logoutBtn.onclick = async () => {
                 await supabaseClient.auth.signOut();
-                window.location.replace('index.html');
+                window.location.replace('/');
             };
         }
     } else if (isLogin) {
         if (session) {
-            window.location.replace('dashboard.html');
+            window.location.replace('/dashboard');
             return;
         }
     }
@@ -75,7 +75,7 @@ if (loginForm) {
             btn.disabled = false;
             spinner.classList.add('hidden');
         } else {
-            window.location.replace('dashboard.html');
+            window.location.replace('/dashboard');
         }
     });
 }
@@ -105,7 +105,7 @@ if (registerForm) {
             btn.disabled = false;
             spinner.classList.add('hidden');
         } else {
-            window.location.replace('dashboard.html');
+            window.location.replace('/dashboard');
         }
     });
 }

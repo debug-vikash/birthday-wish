@@ -26,8 +26,8 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="../css/common.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
 
     <style>
         *, *::before, *::after { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -131,7 +131,7 @@
             </div>
             <h3 class="text-2xl font-headline font-bold text-[#4a3f35] mb-2">No surprises yet</h3>
             <p class="text-[#8a7e72] mb-8 max-w-xs mx-auto text-sm">Start by creating your first magical surprise link.</p>
-            <a href="create.html" class="craft-btn text-white px-8 py-4 font-semibold text-sm flex items-center gap-2">
+            <a href="/create" class="craft-btn text-white px-8 py-4 font-semibold text-sm flex items-center gap-2">
                 <ion-icon name="add-circle"></ion-icon>
                 Create First Surprise
             </a>
@@ -141,13 +141,13 @@
     </main>
 
     <!-- Mobile FAB -->
-    <a href="create.html" class="fixed bottom-8 right-8 z-50 w-14 h-14 craft-btn text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all lg:hidden">
+    <a href="/create" class="fixed bottom-8 right-8 z-50 w-14 h-14 craft-btn text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all lg:hidden">
         <ion-icon name="add" class="text-2xl"></ion-icon>
     </a>
 
     <!-- Desktop Create Prompt -->
     <div class="hidden lg:flex fixed bottom-8 left-1/2 -translate-x-1/2 z-50 scale-up">
-        <a href="create.html" class="paper-card py-4 px-8 rounded-full flex items-center gap-4 group hover:border-primary/30 transition-all">
+        <a href="/create" class="paper-card py-4 px-8 rounded-full flex items-center gap-4 group hover:border-primary/30 transition-all">
             <div class="w-10 h-10 craft-btn text-white rounded-full flex items-center justify-center shadow-sm group-hover:rotate-6 transition-transform">
                 <ion-icon name="color-wand" class="text-lg"></ion-icon>
             </div>
@@ -174,8 +174,8 @@
     <!-- Toast Notification -->
     <div id="toast" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-[110] toast px-6 py-3 rounded-full text-sm font-medium opacity-0 translate-y-4 transition-all"></div>
 
-    <script src="../js/utils.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/dashboard.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>

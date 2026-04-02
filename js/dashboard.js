@@ -72,7 +72,7 @@ async function loadDashboard() {
                 </div>
                 
                 <div class="flex gap-2 pt-1">
-                    <a href="view.html?id=${surprise.id}" target="_blank" class="flex-1 bg-[#f5ece3] hover:bg-[#ede3d8] text-primary font-semibold py-2.5 rounded-xl text-center text-sm transition-all border border-[#f0e4d7] grow-btn">
+                    <a href="/view?id=${surprise.id}" target="_blank" class="flex-1 bg-[#f5ece3] hover:bg-[#ede3d8] text-primary font-semibold py-2.5 rounded-xl text-center text-sm transition-all border border-[#f0e4d7] grow-btn">
                         View
                     </a>
                     <button onclick="copyLinkToClipboard('${surprise.id}', this)" class="flex-1 bg-primary text-white font-semibold py-2.5 rounded-xl text-sm transition-all active:scale-95">
@@ -192,7 +192,8 @@ window.hideDeleteModal = hideDeleteModal;
 window.confirmDelete = confirmDelete;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname.includes('dashboard.html')) {
+    const p = window.location.pathname;
+    if (p.includes('dashboard.html') || p === '/dashboard') {
         loadDashboard();
     }
 });

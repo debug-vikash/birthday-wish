@@ -46,7 +46,7 @@ function createBackgroundParticles() {
  */
 function copyLinkToClipboard(id, btn, isDashboard = true) {
     const link = isDashboard 
-        ? `${window.location.origin}/pages/view.html?id=${id}` 
+        ? `${window.location.origin}/view?id=${id}` 
         : id; // if not dashboard, id is the full link
         
     navigator.clipboard.writeText(link).then(() => {
