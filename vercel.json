@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "birthday-wish",
-  "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
     { "source": "/", "destination": "/pages/index.html" },
@@ -9,8 +8,7 @@
     { "source": "/register", "destination": "/pages/index.html" },
     { "source": "/dashboard", "destination": "/pages/dashboard.html" },
     { "source": "/create", "destination": "/pages/create.html" },
-    { "source": "/view", "destination": "/pages/view.html" },
-    { "source": "/pages/:path*", "destination": "/pages/:path*" }
+    { "source": "/view", "destination": "/pages/view.html" }
   ],
   "headers": [
     {
