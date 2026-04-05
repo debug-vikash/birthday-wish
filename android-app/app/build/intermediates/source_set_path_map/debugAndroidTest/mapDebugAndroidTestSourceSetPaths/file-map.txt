@@ -1,0 +1,6 @@
+com.surpriselink.app.test.app-annotation-experimental-1.3.0-0 C:\Users\vikas\.gradle\caches\8.10.2\transforms\c518591f8d07344e5f2dc9e7570a7069\transformed\annotation-experimental-1.3.0\res
+com.surpriselink.app.test.app-core-1.5.0-1 C:\Users\vikas\.gradle\caches\8.10.2\transforms\ebb0bd378df50993d110aa1eca3e9cb4\transformed\core-1.5.0\res
+com.surpriselink.app.test.app-androidTest-2 D:\Project\Birthday Wish\android-app\app\build\generated\res\resValues\androidTest\debug
+com.surpriselink.app.test.app-mergeDebugAndroidTestResources-3 D:\Project\Birthday Wish\android-app\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.surpriselink.app.test.app-mergeDebugAndroidTestResources-4 D:\Project\Birthday Wish\android-app\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.surpriselink.app.test.app-debugAndroidTest-5 D:\Project\Birthday Wish\android-app\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/splash_gradient_bg">
+
+    <!-- Floating hearts decoration -->
+    <ImageView
+        android:id="@+id/heart1"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="120dp"
+        android:alpha="0.15"
+        android:src="@drawable/ic_heart"
+        app:tint="@color/primary_container" />
+
+    <ImageView
+        android:id="@+id/heart2"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="60dp"
+        android:layout_marginTop="200dp"
+        android:alpha="0.12"
+        android:src="@drawable/ic_heart"
+        app:tint="@color/secondary_container" />
+
+    <ImageView
+        android:id="@+id/heart3"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginBottom="180dp"
+        android:layout_gravity="start|bottom"
+        android:alpha="0.1"
+        android:src="@drawable/ic_heart"
+        app:tint="@color/tertiary_container" />
+
+    <ImageView
+        android:id="@+id/heart4"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="240dp"
+        android:alpha="0.15"
+        android:src="@drawable/ic_heart"
+        app:tint="@color/primary_fixed" />
+
+    <!-- Center content -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <!-- Shimmer glow behind logo -->
+        <FrameLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center">
+
+            <View
+                android:id="@+id/splashShimmer"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_gravity="center"
+                android:alpha="0"
+                android:background="@drawable/shimmer_glow" />
+
+            <ImageView
+                android:id="@+id/splashLogo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_gift_heart"
+                android:contentDescription="@string/app_name" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/splashAppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/plusjakartasans_bold"
+            android:text="@string/app_name"
+            android:textColor="@color/on_surface"
+            android:textSize="32sp"
+            android:letterSpacing="-0.02" />
+
+        <TextView
+            android:id="@+id/splashTagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/plusjakartasans_regular"
+            android:text="@string/splash_tagline"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+</FrameLayout>

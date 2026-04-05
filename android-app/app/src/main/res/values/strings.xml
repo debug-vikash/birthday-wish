@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Surprise Link</string>
+    <string name="splash_tagline">Create magical birthday surprises</string>
+    <string name="loading_text">Preparing your surprise…</string>
+    <string name="offline_title">Oops! No Internet</string>
+    <string name="offline_subtitle">It seems like you\'re offline.\nPlease check your connection and try again.</string>
+    <string name="retry">Try Again</string>
+    <string name="create_surprise">Create Surprise</string>
+    <string name="back">Back</string>
+</resources>

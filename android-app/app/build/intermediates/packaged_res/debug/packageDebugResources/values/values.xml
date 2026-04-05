@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="error">#FFac3149</color>
+    <color name="inverse_on_surface">#FFa09ba3</color>
+    <color name="inverse_primary">#FFfdb5cc</color>
+    <color name="inverse_surface">#FF0f0d13</color>
+    <color name="on_error">#FFfff7f7</color>
+    <color name="on_primary">#FFffeff2</color>
+    <color name="on_primary_container">#FF653245</color>
+    <color name="on_secondary">#FFfff6ff</color>
+    <color name="on_surface">#FF34313b</color>
+    <color name="on_surface_variant">#FF615d69</color>
+    <color name="on_tertiary">#FFfff7f4</color>
+    <color name="outline">#FF7d7985</color>
+    <color name="outline_variant">#FFb5b0bd</color>
+    <color name="primary">#FF874e62</color>
+    <color name="primary_container">#FFfdb5cc</color>
+    <color name="primary_dim">#FF753f52</color>
+    <color name="primary_fixed">#FFfdb5cc</color>
+    <color name="primary_fixed_dim">#FFeea8bf</color>
+    <color name="secondary">#FF6d5586</color>
+    <color name="secondary_container">#FFefdbff</color>
+    <color name="secondary_dim">#FF604979</color>
+    <color name="secondary_fixed">#FFefdbff</color>
+    <color name="splash_bg">#FFFFCCBC</color>
+    <color name="status_bar_color">#00000000</color>
+    <color name="surface">#FFfdf7ff</color>
+    <color name="surface_bright">#FFfdf7ff</color>
+    <color name="surface_container">#FFf2ecf6</color>
+    <color name="surface_container_high">#FFece6f2</color>
+    <color name="surface_container_highest">#FFe7e0ee</color>
+    <color name="surface_container_low">#FFf8f1fb</color>
+    <color name="surface_container_lowest">#FFFFFFFF</color>
+    <color name="surface_dim">#FFded7e6</color>
+    <color name="surface_variant">#FFe7e0ee</color>
+    <color name="tertiary">#FF755a40</color>
+    <color name="tertiary_container">#FFfed9b8</color>
+    <color name="tertiary_dim">#FF684e35</color>
+    <color name="tertiary_fixed">#FFfed9b8</color>
+    <string name="app_name">Surprise Link</string>
+    <string name="back">Back</string>
+    <string name="create_surprise">Create Surprise</string>
+    <string name="loading_text">Preparing your surprise…</string>
+    <string name="offline_subtitle">It seems like you\'re offline.\nPlease check your connection and try again.</string>
+    <string name="offline_title">Oops! No Internet</string>
+    <string name="retry">Try Again</string>
+    <string name="splash_tagline">Create magical birthday surprises</string>
+    <style name="FABShape" parent="ShapeAppearanceOverlay.MaterialComponents.FloatingActionButton">
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="Theme.SurpriseLink" parent="Theme.MaterialComponents.Light.NoActionBar">
+        
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dim</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_dim</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+
+        
+        <item name="android:colorBackground">@color/surface</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/on_error</item>
+
+        
+        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowLightNavigationBar">true</item>
+
+        
+        <item name="android:windowAnimationStyle">@style/WindowAnimation</item>
+    </style>
+    <style name="Theme.SurpriseLink.Splash" parent="Theme.SurpriseLink">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+    <style name="WindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:activityOpenExitAnimation">@android:anim/fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:activityCloseExitAnimation">@android:anim/fade_out</item>
+    </style>
+</resources>

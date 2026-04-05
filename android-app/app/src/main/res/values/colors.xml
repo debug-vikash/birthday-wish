@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary -->
+    <color name="primary">#FF874e62</color>
+    <color name="primary_container">#FFfdb5cc</color>
+    <color name="primary_dim">#FF753f52</color>
+    <color name="primary_fixed">#FFfdb5cc</color>
+    <color name="primary_fixed_dim">#FFeea8bf</color>
+    <color name="on_primary">#FFffeff2</color>
+    <color name="on_primary_container">#FF653245</color>
+
+    <!-- Secondary -->
+    <color name="secondary">#FF6d5586</color>
+    <color name="secondary_container">#FFefdbff</color>
+    <color name="secondary_dim">#FF604979</color>
+    <color name="secondary_fixed">#FFefdbff</color>
+    <color name="on_secondary">#FFfff6ff</color>
+
+    <!-- Tertiary -->
+    <color name="tertiary">#FF755a40</color>
+    <color name="tertiary_container">#FFfed9b8</color>
+    <color name="tertiary_dim">#FF684e35</color>
+    <color name="tertiary_fixed">#FFfed9b8</color>
+    <color name="on_tertiary">#FFfff7f4</color>
+
+    <!-- Surface -->
+    <color name="surface">#FFfdf7ff</color>
+    <color name="surface_bright">#FFfdf7ff</color>
+    <color name="surface_container">#FFf2ecf6</color>
+    <color name="surface_container_high">#FFece6f2</color>
+    <color name="surface_container_highest">#FFe7e0ee</color>
+    <color name="surface_container_low">#FFf8f1fb</color>
+    <color name="surface_container_lowest">#FFFFFFFF</color>
+    <color name="surface_dim">#FFded7e6</color>
+    <color name="surface_variant">#FFe7e0ee</color>
+
+    <!-- On Surface -->
+    <color name="on_surface">#FF34313b</color>
+    <color name="on_surface_variant">#FF615d69</color>
+
+    <!-- Error -->
+    <color name="error">#FFac3149</color>
+    <color name="on_error">#FFfff7f7</color>
+
+    <!-- Outline -->
+    <color name="outline">#FF7d7985</color>
+    <color name="outline_variant">#FFb5b0bd</color>
+
+    <!-- Inverse -->
+    <color name="inverse_surface">#FF0f0d13</color>
+    <color name="inverse_on_surface">#FFa09ba3</color>
+    <color name="inverse_primary">#FFfdb5cc</color>
+
+    <!-- Status bar -->
+    <color name="status_bar_color">#00000000</color>
+    <color name="splash_bg">#FFFFCCBC</color>
+</resources>

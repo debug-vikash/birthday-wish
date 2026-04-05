@@ -1,0 +1,102 @@
+[
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plusjakartasans_bold.ttf.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plusjakartasans_bold.ttf"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_back.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_back.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_glass_card_bg.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\glass_card_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plusjakartasans_regular.ttf.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plusjakartasans_regular.ttf"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_heart.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_heart.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plus_jakarta_sans_bold.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plus_jakarta_sans_bold.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_progress_gradient.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\progress_gradient.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plus_jakarta_sans.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plus_jakarta_sans.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_splash_gradient_bg.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\splash_gradient_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_gift_heart.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_gift_heart.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plus_jakarta_sans_semibold.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plus_jakarta_sans_semibold.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_shimmer_glow.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\shimmer_glow.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_offline.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_offline.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_loading_dot.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\loading_dot.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\layout_activity_splash.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\layout\\activity_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\xml_file_paths.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\xml\\file_paths.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_btn_ripple_circle.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\btn_ripple_circle.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plusjakartasans_semibold.ttf.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plusjakartasans_semibold.ttf"
+    },
+    {
+        "merged": "com.surpriselink.app-debug-34:/layout_activity_splash.xml.flat",
+        "source": "com.surpriselink.app-main-36:/layout/activity_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_add.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_add.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_header_bg.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\header_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_btn_primary_pill.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\btn_primary_pill.xml"
+    }
+]

@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.surpriselink.app-mergeDebugResources-32:/values-v29/values-v29.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\vikas\\.gradle\\caches\\8.10.2\\transforms\\7b516ed92c0b1755596e67b75581ec11\\transformed\\core-splashscreen-1.0.1\\res\\values-v29\\values-v29.xml",
+                    "from": {
+                        "startLines": "2,7",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,374",
+                        "endLines": "6,8",
+                        "endColumns": "12,12",
+                        "endOffsets": "369,464"
+                    }
+                }
+            ]
+        }
+    ]
+}
