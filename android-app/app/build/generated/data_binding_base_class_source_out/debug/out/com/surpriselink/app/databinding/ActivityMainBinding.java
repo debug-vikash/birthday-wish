@@ -14,9 +14,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.surpriselink.app.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -24,13 +26,16 @@ import java.lang.String;
 
 public final class ActivityMainBinding implements ViewBinding {
   @NonNull
-  private final FrameLayout rootView;
+  private final CoordinatorLayout rootView;
+
+  @NonNull
+  public final AppBarLayout appBarLayout;
 
   @NonNull
   public final ImageButton backButton;
 
   @NonNull
-  public final ExtendedFloatingActionButton fabCreate;
+  public final BottomNavigationView bottomNav;
 
   @NonNull
   public final LinearLayout headerBar;
@@ -68,15 +73,17 @@ public final class ActivityMainBinding implements ViewBinding {
   @NonNull
   public final WebView webView;
 
-  private ActivityMainBinding(@NonNull FrameLayout rootView, @NonNull ImageButton backButton,
-      @NonNull ExtendedFloatingActionButton fabCreate, @NonNull LinearLayout headerBar,
+  private ActivityMainBinding(@NonNull CoordinatorLayout rootView,
+      @NonNull AppBarLayout appBarLayout, @NonNull ImageButton backButton,
+      @NonNull BottomNavigationView bottomNav, @NonNull LinearLayout headerBar,
       @NonNull TextView headerTitle, @NonNull View loadingDot1, @NonNull View loadingDot2,
       @NonNull View loadingDot3, @NonNull FrameLayout loadingOverlay, @NonNull TextView loadingText,
       @NonNull ImageView offlineIllustration, @NonNull FrameLayout offlineScreen,
       @NonNull ProgressBar progressBar, @NonNull Button retryButton, @NonNull WebView webView) {
     this.rootView = rootView;
+    this.appBarLayout = appBarLayout;
     this.backButton = backButton;
-    this.fabCreate = fabCreate;
+    this.bottomNav = bottomNav;
     this.headerBar = headerBar;
     this.headerTitle = headerTitle;
     this.loadingDot1 = loadingDot1;
@@ -93,7 +100,7 @@ public final class ActivityMainBinding implements ViewBinding {
 
   @Override
   @NonNull
-  public FrameLayout getRoot() {
+  public CoordinatorLayout getRoot() {
     return rootView;
   }
 
@@ -118,15 +125,21 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.appBarLayout;
+      AppBarLayout appBarLayout = ViewBindings.findChildViewById(rootView, id);
+      if (appBarLayout == null) {
+        break missingId;
+      }
+
       id = R.id.backButton;
       ImageButton backButton = ViewBindings.findChildViewById(rootView, id);
       if (backButton == null) {
         break missingId;
       }
 
-      id = R.id.fabCreate;
-      ExtendedFloatingActionButton fabCreate = ViewBindings.findChildViewById(rootView, id);
-      if (fabCreate == null) {
+      id = R.id.bottomNav;
+      BottomNavigationView bottomNav = ViewBindings.findChildViewById(rootView, id);
+      if (bottomNav == null) {
         break missingId;
       }
 
@@ -202,9 +215,9 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((FrameLayout) rootView, backButton, fabCreate, headerBar,
-          headerTitle, loadingDot1, loadingDot2, loadingDot3, loadingOverlay, loadingText,
-          offlineIllustration, offlineScreen, progressBar, retryButton, webView);
+      return new ActivityMainBinding((CoordinatorLayout) rootView, appBarLayout, backButton,
+          bottomNav, headerBar, headerTitle, loadingDot1, loadingDot2, loadingDot3, loadingOverlay,
+          loadingText, offlineIllustration, offlineScreen, progressBar, retryButton, webView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

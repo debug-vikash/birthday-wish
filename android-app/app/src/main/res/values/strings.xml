@@ -8,4 +8,7 @@
     <string name="retry">Try Again</string>
     <string name="create_surprise">Create Surprise</string>
     <string name="back">Back</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_create">Create</string>
+    <string name="nav_profile">Profile</string>
 </resources>

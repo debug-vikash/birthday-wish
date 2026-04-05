@@ -22,7 +22,7 @@
         <item name="android:windowLightStatusBar">true</item>
 
         <!-- Navigation bar -->
-        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:navigationBarColor">@color/nav_surface</item>
         <item name="android:windowLightNavigationBar">true</item>
 
         <!-- Animations -->
@@ -48,4 +48,5 @@
     <style name="FABShape" parent="ShapeAppearanceOverlay.MaterialComponents.FloatingActionButton">
         <item name="cornerSize">50%</item>
     </style>
+
 </resources>

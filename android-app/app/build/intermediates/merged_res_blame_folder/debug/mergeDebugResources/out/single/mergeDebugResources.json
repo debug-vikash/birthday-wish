@@ -44,24 +44,48 @@
         "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_gift_heart.xml"
     },
     {
+        "merged": "com.surpriselink.app-debug-34:/drawable_ic_create.xml.flat",
+        "source": "com.surpriselink.app-main-36:/drawable/ic_create.xml"
+    },
+    {
         "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
         "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "com.surpriselink.app-debug-34:/drawable_ic_home.xml.flat",
+        "source": "com.surpriselink.app-main-36:/drawable/ic_home.xml"
     },
     {
         "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plus_jakarta_sans_semibold.xml.flat",
         "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plus_jakarta_sans_semibold.xml"
     },
     {
+        "merged": "com.surpriselink.app-debug-34:/color_bottom_nav_color.xml.flat",
+        "source": "com.surpriselink.app-main-36:/color/bottom_nav_color.xml"
+    },
+    {
+        "merged": "com.surpriselink.app-debug-34:/drawable_bottom_nav_bg.xml.flat",
+        "source": "com.surpriselink.app-main-36:/drawable/bottom_nav_bg.xml"
+    },
+    {
+        "merged": "com.surpriselink.app-debug-34:/layout_activity_main.xml.flat",
+        "source": "com.surpriselink.app-main-36:/layout/activity_main.xml"
+    },
+    {
         "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_shimmer_glow.xml.flat",
         "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\shimmer_glow.xml"
     },
     {
-        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_offline.xml.flat",
-        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_offline.xml"
+        "merged": "com.surpriselink.app-debug-34:/drawable_ic_profile.xml.flat",
+        "source": "com.surpriselink.app-main-36:/drawable/ic_profile.xml"
     },
     {
         "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_loading_dot.xml.flat",
         "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\loading_dot.xml"
+    },
+    {
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_offline.xml.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\ic_offline.xml"
     },
     {
         "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\layout_activity_splash.xml.flat",
@@ -80,12 +104,12 @@
         "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\drawable\\btn_ripple_circle.xml"
     },
     {
-        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plusjakartasans_semibold.ttf.flat",
-        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plusjakartasans_semibold.ttf"
+        "merged": "com.surpriselink.app-debug-34:/menu_bottom_nav_menu.xml.flat",
+        "source": "com.surpriselink.app-main-36:/menu/bottom_nav_menu.xml"
     },
     {
-        "merged": "com.surpriselink.app-debug-34:/layout_activity_splash.xml.flat",
-        "source": "com.surpriselink.app-main-36:/layout/activity_splash.xml"
+        "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\font_plusjakartasans_semibold.ttf.flat",
+        "source": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-main-36:\\font\\plusjakartasans_semibold.ttf"
     },
     {
         "merged": "C:\\Users\\vikas\\.gradle\\daemon\\8.10.2\\com.surpriselink.app-debug-34:\\drawable_ic_add.xml.flat",
