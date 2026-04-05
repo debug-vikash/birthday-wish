@@ -1,242 +1,254 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface">
+    android:background="@color/surface"
+    android:fitsSystemWindows="false">
 
     <!-- ============ HEADER BAR ============ -->
-    <LinearLayout
-        android:id="@+id/headerBar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_gravity="top"
-        android:background="@drawable/header_bg"
-        android:elevation="2dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="12dp">
-
-        <ImageButton
-            android:id="@+id/backButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/btn_ripple_circle"
-            android:contentDescription="Back"
-            android:src="@drawable/ic_back"
-            android:visibility="invisible"
-            android:padding="8dp" />
-
-        <TextView
-            android:id="@+id/headerTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="@font/plusjakartasans_semibold"
-            android:gravity="center"
-            android:text="@string/app_name"
-            android:textColor="@color/on_surface"
-            android:textSize="18sp"
-            android:letterSpacing="-0.01" />
-
-        <!-- Placeholder for symmetry -->
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp" />
-    </LinearLayout>
-
-    <!-- ============ PROGRESS BAR ============ -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_gravity="top"
-        android:layout_marginTop="56dp"
-        android:indeterminate="false"
-        android:max="100"
-        android:progress="0"
-        android:progressDrawable="@drawable/progress_gradient" />
-
-    <!-- ============ WEBVIEW ============ -->
-    <WebView
-        android:id="@+id/webView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="59dp"
-        android:visibility="gone" />
-
-    <!-- ============ LOADING OVERLAY ============ -->
-    <FrameLayout
-        android:id="@+id/loadingOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
+        android:layout_height="wrap_content"
         android:background="@color/surface"
-        android:visibility="visible">
+        android:elevation="0dp"
+        app:elevation="0dp">
 
-        <!-- Background floating hearts -->
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="start"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="100dp"
-            android:alpha="0.08"
-            android:src="@drawable/ic_heart"
-            app:tint="@color/primary_container" />
-
-        <ImageView
-            android:layout_width="14dp"
-            android:layout_height="14dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="50dp"
-            android:layout_marginTop="180dp"
-            android:alpha="0.06"
-            android:src="@drawable/ic_heart"
-            app:tint="@color/secondary_container" />
-
-        <ImageView
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_gravity="start|bottom"
-            android:layout_marginStart="60dp"
-            android:layout_marginBottom="200dp"
-            android:alpha="0.07"
-            android:src="@drawable/ic_heart"
-            app:tint="@color/tertiary_container" />
-
-        <!-- Glassmorphism loader card -->
         <LinearLayout
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/glass_card_bg"
-            android:elevation="4dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="32dp">
+            android:id="@+id/headerBar"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@color/surface"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
 
-            <!-- Loading dots -->
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/btn_ripple_circle"
+                android:contentDescription="@string/back"
+                android:padding="6dp"
+                android:src="@drawable/ic_back"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/headerTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/plusjakartasans_semibold"
+                android:gravity="center"
+                android:letterSpacing="-0.01"
+                android:text="@string/app_name"
+                android:textColor="@color/on_surface"
+                android:textSize="17sp" />
+
+            <!-- Placeholder for symmetry -->
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp" />
+        </LinearLayout>
+
+        <!-- Thin progress bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/progress_gradient"
+            android:visibility="invisible" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ============ MAIN CONTENT AREA ============ -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- ============ WEBVIEW ============ -->
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="56dp"
+            android:background="@color/surface"
+            android:overScrollMode="never"
+            android:visibility="invisible" />
+
+        <!-- ============ LOADING OVERLAY ============ -->
+        <FrameLayout
+            android:id="@+id/loadingOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface"
+            android:visibility="visible">
+
+            <!-- Decorative floating hearts -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="80dp"
+                android:alpha="0.06"
+                android:src="@drawable/ic_heart"
+                app:tint="@color/primary_container" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="45dp"
+                android:layout_marginTop="140dp"
+                android:alpha="0.05"
+                android:src="@drawable/ic_heart"
+                app:tint="@color/secondary_container" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="220dp"
+                android:layout_marginStart="120dp"
+                android:alpha="0.04"
+                android:src="@drawable/ic_heart"
+                app:tint="@color/tertiary_container" />
+
+            <!-- Glassmorphism loader card -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:orientation="horizontal">
-
-                <View
-                    android:id="@+id/loadingDot1"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/loading_dot" />
-
-                <View
-                    android:id="@+id/loadingDot2"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/loading_dot" />
-
-                <View
-                    android:id="@+id/loadingDot3"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_margin="6dp"
-                    android:background="@drawable/loading_dot" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/loadingText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:fontFamily="@font/plusjakartasans_regular"
-                android:text="@string/loading_text"
-                android:textAlignment="center"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-    </FrameLayout>
-
-    <!-- ============ OFFLINE SCREEN ============ -->
-    <FrameLayout
-        android:id="@+id/offlineScreen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:background="@color/surface"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingHorizontal="48dp">
-
-            <!-- Offline illustration -->
-            <ImageView
-                android:id="@+id/offlineIllustration"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/ic_offline"
-                android:contentDescription="No internet" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:fontFamily="@font/plusjakartasans_bold"
-                android:text="@string/offline_title"
-                android:textColor="@color/on_surface"
-                android:textSize="22sp"
-                android:letterSpacing="-0.02" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:fontFamily="@font/plusjakartasans_regular"
+                android:background="@drawable/glass_card_bg"
+                android:elevation="4dp"
                 android:gravity="center"
-                android:text="@string/offline_subtitle"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp" />
+                android:orientation="vertical"
+                android:padding="28dp">
 
-            <Button
-                android:id="@+id/retryButton"
-                android:layout_width="180dp"
-                android:layout_height="52dp"
-                android:layout_marginTop="32dp"
-                android:background="@drawable/btn_primary_pill"
-                android:fontFamily="@font/plusjakartasans_semibold"
-                android:text="@string/retry"
-                android:textAllCaps="false"
-                android:textColor="@color/on_primary"
-                android:textSize="15sp"
-                android:stateListAnimator="@null" />
+                <!-- Loading dots -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
 
-        </LinearLayout>
+                    <View
+                        android:id="@+id/loadingDot1"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/loading_dot" />
+
+                    <View
+                        android:id="@+id/loadingDot2"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/loading_dot" />
+
+                    <View
+                        android:id="@+id/loadingDot3"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/loading_dot" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/loadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/plusjakartasans_regular"
+                    android:text="@string/loading_text"
+                    android:textAlignment="center"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- ============ OFFLINE SCREEN ============ -->
+        <FrameLayout
+            android:id="@+id/offlineScreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="48dp">
+
+                <ImageView
+                    android:id="@+id/offlineIllustration"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:contentDescription="No internet"
+                    android:src="@drawable/ic_offline" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/plusjakartasans_bold"
+                    android:letterSpacing="-0.02"
+                    android:text="@string/offline_title"
+                    android:textColor="@color/on_surface"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/plusjakartasans_regular"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    android:text="@string/offline_subtitle"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/retryButton"
+                    android:layout_width="160dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="28dp"
+                    android:background="@drawable/btn_primary_pill"
+                    android:fontFamily="@font/plusjakartasans_semibold"
+                    android:stateListAnimator="@null"
+                    android:text="@string/retry"
+                    android:textAllCaps="false"
+                    android:textColor="@color/on_primary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+        </FrameLayout>
+
     </FrameLayout>
 
-    <!-- ============ FLOATING ACTION BUTTON ============ -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fabCreate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:backgroundTint="@color/primary"
-        android:fontFamily="@font/plusjakartasans_semibold"
-        android:text="@string/create_surprise"
-        android:textAllCaps="false"
-        android:textColor="@color/on_primary"
-        android:textSize="13sp"
-        app:icon="@drawable/ic_add"
-        app:iconTint="@color/on_primary"
-        app:shapeAppearanceOverlay="@style/FABShape" />
+    <!-- ============ BOTTOM NAVIGATION ============ -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_nav_bg"
+        android:elevation="8dp"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemRippleColor="@color/nav_indicator" />
 
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

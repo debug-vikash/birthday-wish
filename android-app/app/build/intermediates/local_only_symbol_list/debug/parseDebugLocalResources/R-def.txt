@@ -1,9 +1,12 @@
 R_DEF: Internal format may change without notice
 local
+color bottom_nav_color
 color error
 color inverse_on_surface
 color inverse_primary
 color inverse_surface
+color nav_indicator
+color nav_surface
 color on_error
 color on_primary
 color on_primary_container
@@ -37,15 +40,20 @@ color tertiary
 color tertiary_container
 color tertiary_dim
 color tertiary_fixed
+dimen bottom_nav_height
+drawable bottom_nav_bg
 drawable btn_primary_pill
 drawable btn_ripple_circle
 drawable glass_card_bg
 drawable header_bg
 drawable ic_add
 drawable ic_back
+drawable ic_create
 drawable ic_gift_heart
 drawable ic_heart
+drawable ic_home
 drawable ic_offline
+drawable ic_profile
 drawable loading_dot
 drawable progress_gradient
 drawable shimmer_glow
@@ -53,8 +61,9 @@ drawable splash_gradient_bg
 font plusjakartasans_bold
 font plusjakartasans_regular
 font plusjakartasans_semibold
+id appBarLayout
 id backButton
-id fabCreate
+id bottomNav
 id headerBar
 id headerTitle
 id heart1
@@ -66,6 +75,9 @@ id loadingDot2
 id loadingDot3
 id loadingOverlay
 id loadingText
+id nav_create
+id nav_home
+id nav_profile
 id offlineIllustration
 id offlineScreen
 id progressBar
@@ -77,12 +89,16 @@ id splashTagline
 id webView
 layout activity_main
 layout activity_splash
+menu bottom_nav_menu
 mipmap ic_launcher
 mipmap ic_launcher_round
 string app_name
 string back
 string create_surprise
 string loading_text
+string nav_create
+string nav_home
+string nav_profile
 string offline_subtitle
 string offline_title
 string retry

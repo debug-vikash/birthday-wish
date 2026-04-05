@@ -54,4 +54,8 @@
     <!-- Status bar -->
     <color name="status_bar_color">#00000000</color>
     <color name="splash_bg">#FFFFCCBC</color>
+
+    <!-- Navigation -->
+    <color name="nav_indicator">#20874e62</color>
+    <color name="nav_surface">#FFFFFFFF</color>
 </resources>
