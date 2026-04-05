@@ -1,0 +1,37 @@
+com.surpriselink.app-coordinatorlayout-1.1.0-0 C:\Users\vikas\.gradle\caches\8.10.2\transforms\03923f6938f45c216eb4b4385f961f2a\transformed\coordinatorlayout-1.1.0\res
+com.surpriselink.app-core-1.12.0-1 C:\Users\vikas\.gradle\caches\8.10.2\transforms\0a60284d4f7554647b18ae26eb6de60b\transformed\core-1.12.0\res
+com.surpriselink.app-constraintlayout-2.1.4-2 C:\Users\vikas\.gradle\caches\8.10.2\transforms\104e4b11e8e3d5fc439078c6c6c35206\transformed\constraintlayout-2.1.4\res
+com.surpriselink.app-lifecycle-viewmodel-savedstate-2.6.1-3 C:\Users\vikas\.gradle\caches\8.10.2\transforms\177efc1d03bd588bb7a8fc9e400b9079\transformed\lifecycle-viewmodel-savedstate-2.6.1\res
+com.surpriselink.app-lifecycle-livedata-2.6.1-4 C:\Users\vikas\.gradle\caches\8.10.2\transforms\22a61dc193b3964a67fa4be287a4e040\transformed\lifecycle-livedata-2.6.1\res
+com.surpriselink.app-lifecycle-viewmodel-2.6.1-5 C:\Users\vikas\.gradle\caches\8.10.2\transforms\273700ddafb876acffab196a8d246c2b\transformed\lifecycle-viewmodel-2.6.1\res
+com.surpriselink.app-lifecycle-runtime-2.6.1-6 C:\Users\vikas\.gradle\caches\8.10.2\transforms\27d685f0375936699a28ff46ab751961\transformed\lifecycle-runtime-2.6.1\res
+com.surpriselink.app-emoji2-1.2.0-7 C:\Users\vikas\.gradle\caches\8.10.2\transforms\2f9fc144b633e74a49f8d1c603895f14\transformed\emoji2-1.2.0\res
+com.surpriselink.app-core-ktx-1.12.0-8 C:\Users\vikas\.gradle\caches\8.10.2\transforms\375e465433b1c444a8544772d71ba8ed\transformed\core-ktx-1.12.0\res
+com.surpriselink.app-appcompat-resources-1.6.1-9 C:\Users\vikas\.gradle\caches\8.10.2\transforms\43ca6a8e50ebe9040ecc1bf35ba56721\transformed\appcompat-resources-1.6.1\res
+com.surpriselink.app-viewpager2-1.0.0-10 C:\Users\vikas\.gradle\caches\8.10.2\transforms\4fb4b519bab9e8c1a40227e3b5d13cb6\transformed\viewpager2-1.0.0\res
+com.surpriselink.app-emoji2-views-helper-1.2.0-11 C:\Users\vikas\.gradle\caches\8.10.2\transforms\5c483f14d0bd1918556cd7d68ec3f228\transformed\emoji2-views-helper-1.2.0\res
+com.surpriselink.app-savedstate-1.2.1-12 C:\Users\vikas\.gradle\caches\8.10.2\transforms\6b2aa5243c63d74675e76ff133be8a4e\transformed\savedstate-1.2.1\res
+com.surpriselink.app-lifecycle-livedata-core-2.6.1-13 C:\Users\vikas\.gradle\caches\8.10.2\transforms\7189798bca4e950af1afd382b072ff28\transformed\lifecycle-livedata-core-2.6.1\res
+com.surpriselink.app-activity-1.8.0-14 C:\Users\vikas\.gradle\caches\8.10.2\transforms\794d63f9eac7c4d8e836eab77139f30b\transformed\activity-1.8.0\res
+com.surpriselink.app-core-splashscreen-1.0.1-15 C:\Users\vikas\.gradle\caches\8.10.2\transforms\7b516ed92c0b1755596e67b75581ec11\transformed\core-splashscreen-1.0.1\res
+com.surpriselink.app-fragment-1.3.6-16 C:\Users\vikas\.gradle\caches\8.10.2\transforms\7f44962457e682876b571b55df7dc8b1\transformed\fragment-1.3.6\res
+com.surpriselink.app-core-runtime-2.2.0-17 C:\Users\vikas\.gradle\caches\8.10.2\transforms\844c82ce86a4cefb4964aa0d19c3e8af\transformed\core-runtime-2.2.0\res
+com.surpriselink.app-swiperefreshlayout-1.1.0-18 C:\Users\vikas\.gradle\caches\8.10.2\transforms\8f012c3185be1871ffe0bb198d1bd93c\transformed\swiperefreshlayout-1.1.0\res
+com.surpriselink.app-profileinstaller-1.3.0-19 C:\Users\vikas\.gradle\caches\8.10.2\transforms\8f8cfb55e10b6b1e887b5f424ff4567d\transformed\profileinstaller-1.3.0\res
+com.surpriselink.app-startup-runtime-1.1.1-20 C:\Users\vikas\.gradle\caches\8.10.2\transforms\9c8f38121fec5b20166332e899169171\transformed\startup-runtime-1.1.1\res
+com.surpriselink.app-lifecycle-process-2.6.1-21 C:\Users\vikas\.gradle\caches\8.10.2\transforms\a4dae0543cc52e5ac1743eb25bf14c03\transformed\lifecycle-process-2.6.1\res
+com.surpriselink.app-appcompat-1.6.1-22 C:\Users\vikas\.gradle\caches\8.10.2\transforms\a73329cb2b7cad1f04255d24f8f5655c\transformed\appcompat-1.6.1\res
+com.surpriselink.app-material-1.11.0-23 C:\Users\vikas\.gradle\caches\8.10.2\transforms\b080f5da62029c8ed324d022b0c9914b\transformed\material-1.11.0\res
+com.surpriselink.app-annotation-experimental-1.3.0-24 C:\Users\vikas\.gradle\caches\8.10.2\transforms\c518591f8d07344e5f2dc9e7570a7069\transformed\annotation-experimental-1.3.0\res
+com.surpriselink.app-cardview-1.0.0-25 C:\Users\vikas\.gradle\caches\8.10.2\transforms\c59ff3c2d6e2d071996c4538c0239f29\transformed\cardview-1.0.0\res
+com.surpriselink.app-recyclerview-1.1.0-26 C:\Users\vikas\.gradle\caches\8.10.2\transforms\cb87a96b997dbfeb515173d8fe6b62ac\transformed\recyclerview-1.1.0\res
+com.surpriselink.app-drawerlayout-1.1.1-27 C:\Users\vikas\.gradle\caches\8.10.2\transforms\db449396a1b692e2211036686be9f347\transformed\drawerlayout-1.1.1\res
+com.surpriselink.app-lottie-6.3.0-28 C:\Users\vikas\.gradle\caches\8.10.2\transforms\e40220c36327486ec8235315a6ebb8e5\transformed\lottie-6.3.0\res
+com.surpriselink.app-transition-1.2.0-29 C:\Users\vikas\.gradle\caches\8.10.2\transforms\f1a243252610cbbb686c51038244f0fc\transformed\transition-1.2.0\res
+com.surpriselink.app-pngs-30 D:\Project\Birthday Wish\android-app\app\build\generated\res\pngs\debug
+com.surpriselink.app-resValues-31 D:\Project\Birthday Wish\android-app\app\build\generated\res\resValues\debug
+com.surpriselink.app-packageDebugResources-32 D:\Project\Birthday Wish\android-app\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.surpriselink.app-packageDebugResources-33 D:\Project\Birthday Wish\android-app\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.surpriselink.app-debug-34 D:\Project\Birthday Wish\android-app\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.surpriselink.app-debug-35 D:\Project\Birthday Wish\android-app\app\src\debug\res
+com.surpriselink.app-main-36 D:\Project\Birthday Wish\android-app\app\src\main\res

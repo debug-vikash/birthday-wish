@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Gift box body -->
+    <path
+        android:fillColor="#874e62"
+        android:pathData="M20,45 L20,80 C20,83 22,85 25,85 L75,85 C78,85 80,83 80,80 L80,45 Z" />
+    <!-- Gift box lid -->
+    <path
+        android:fillColor="#753f52"
+        android:pathData="M16,35 L84,35 C86,35 88,37 88,39 L88,45 L12,45 L12,39 C12,37 14,35 16,35 Z" />
+    <!-- Ribbon vertical -->
+    <path
+        android:fillColor="#FFB7CE"
+        android:pathData="M46,35 L54,35 L54,85 L46,85 Z" />
+    <!-- Ribbon horizontal -->
+    <path
+        android:fillColor="#FFB7CE"
+        android:pathData="M16,55 L84,55 L84,63 L16,63 Z" />
+    <!-- Heart bow left -->
+    <path
+        android:fillColor="#FFB7CE"
+        android:pathData="M50,35 C50,35 42,20 35,20 C28,20 24,25 24,30 C24,35 50,35 50,35 Z" />
+    <!-- Heart bow right -->
+    <path
+        android:fillColor="#eea8bf"
+        android:pathData="M50,35 C50,35 58,20 65,20 C72,20 76,25 76,30 C76,35 50,35 50,35 Z" />
+</vector>

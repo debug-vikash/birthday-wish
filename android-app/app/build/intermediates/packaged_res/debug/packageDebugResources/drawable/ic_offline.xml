@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Cloud body -->
+    <path
+        android:fillColor="#eee7e6"
+        android:pathData="M95,65 C95,56 89,49 81,47 C80,37 72,30 62,30 C55,30 49,34 46,39 C44,38 42,37 39,37 C31,37 25,43 25,51 C25,51.5 25,52 25.1,52.5 C20,54 17,59 17,65 C17,72 22,78 30,78 L90,78 C93,78 95,75 95,72 Z" />
+    <!-- Wifi symbol slashed -->
+    <path
+        android:fillColor="#874e62"
+        android:strokeColor="#874e62"
+        android:strokeWidth="2"
+        android:pathData="M60,95 m-4,0 a4,4 0,1,1 8,0 a4,4 0,1,1 -8,0" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#874e62"
+        android:strokeWidth="2.5"
+        android:pathData="M48,87 Q60,78 72,87" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#874e62"
+        android:strokeWidth="2.5"
+        android:pathData="M40,80 Q60,66 80,80" />
+    <!-- Strike-through line -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#b41340"
+        android:strokeWidth="3"
+        android:pathData="M38,100 L82,72" />
+    <!-- Sad face on cloud -->
+    <path
+        android:fillColor="#874e62"
+        android:pathData="M50,57 m-2,0 a2,2 0,1,1 4,0 a2,2 0,1,1 -4,0" />
+    <path
+        android:fillColor="#874e62"
+        android:pathData="M70,57 m-2,0 a2,2 0,1,1 4,0 a2,2 0,1,1 -4,0" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#874e62"
+        android:strokeWidth="2"
+        android:pathData="M53,67 Q60,63 67,67" />
+</vector>
